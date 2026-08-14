@@ -1,0 +1,14 @@
+Testing: tickets-wwe-experience
+
+=== FULL RESPONSE ANALYSIS ===
+Found field 'event_tickets': list with 3
+  First item keys: ['_id', 'shortcode', 'title', 'description', 'quantity', 'price', 'original_price', 'vat', 'currency', 'type', 'requires_entry_ticket', 'start_sale_date', 'start_sale_date_str', 'end_sale_date', 'end_sale_date_str', 'min_per_order', 'max_per_order', 'max_purchase_limit_per_user', 'seats_io_category', 'ticket_color', 'text_color', 'sold_out', 'remaining', 'sale_status', 'require_admin_approval', 'allow_unjoin', 'ticket_order', 'gallery_images', 'has_group', 'group_name', 'group_name_en', 'group_description', 'group_rt_description', 'group_gallery_images', 'has_merch', 'has_seat_name', 'has_name', 'is_resellable', 'resell_counter', 'ticket_type', 'app_store_product_id', 'subscription_ticket_type_id', 'subscription_ticket_type', 'ignore_user_order_limit', 'restaurant_table_area', 'has_voucher', 'seating_type', 'prerequisite_tickets', 'prerequisite_tickets_ratio', 'refund_fee_configurations', 'ticket_status', 'status_message', 'accessibility_type', 'dubai_provider', 'allocation_ids', 'allocation_channel_keys']
+
+Full response written to full_event_response.json
+
+=== COMPARE FIELDS ===
+ticket_packages: 0 items
+event_tickets: 3 items
+
+=== SEARCHING ALL KEYS ===
+FOUND TICKETS IN: 'event_tickets' with 3 items

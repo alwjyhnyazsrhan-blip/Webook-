@@ -1,0 +1,8 @@
+# Worker-specific Dockerfile
+FROM webook_fixed-app
+
+# Fix line endings as part of image build
+RUN find /app -name "*.py" -exec sed -i -e 's/\r$//' -e 's/\xEF\xBB\xBF//' {} \; 2>/dev/null || true
+
+# Override CMD to run worker
+CMD ["python", "-m", "apps.worker.main"]

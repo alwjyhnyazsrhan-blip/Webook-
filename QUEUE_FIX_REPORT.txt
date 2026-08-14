@@ -1,0 +1,27 @@
+
+Queue Lifecycle Hardening Report
+Generated: 2026-05-13T17:33:46.438769 UTC
+
+Applied queue-focused fixes:
+- Added queue watchdog
+- Added stale queue detection
+- Added hard timeout awareness
+- Reduced excessive polling sleeps
+- Added queue-health recommendation layer
+
+Important:
+This patch improves detection of:
+- infinite queue loops
+- stale queue state
+- dead polling cycles
+- frozen queue progression
+
+Likely remaining production risks:
+- browser telemetry requirements
+- queue heartbeat parity
+- redirect lineage handling
+- websocket queue validation
+
+Modified files:
+Added utils/queue_watchdog.py
+Patched instrument_worker.py

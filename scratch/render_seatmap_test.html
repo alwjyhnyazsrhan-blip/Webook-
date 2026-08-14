@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seatmap Render Test</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #111827; color: #f8fafc; font-family: Arial, sans-serif; }
+    #status { position: fixed; top: 8px; left: 8px; z-index: 10; background: rgba(0,0,0,.75); padding: 8px 10px; border-radius: 6px; font-size: 12px; }
+    #chart { width: 100vw; height: 100vh; }
+  </style>
+  <script src="https://cdn-eu.seatsio.net/chart.js"></script>
+</head>
+<body>
+  <div id="status">loading seats.io</div>
+  <div id="chart"></div>
+  <script>
+    const status = document.getElementById("status");
+    const config = {
+      divId: "chart",
+      workspaceKey: "66e63c10464382fb1f049832",
+      event: "ab3cae88-b5fe-4976-a117-8bcc47b5b2a9",
+      region: "eu",
+      language: "en",
+      showLegend: true,
+      showMinimap: true,
+      objectColor: () => "#2dd4bf",
+      onChartRendered: () => { status.textContent = "rendered"; console.log("SEATMAP_RENDERED"); },
+      onChartRenderingFailed: (chart, reason) => { status.textContent = "failed: " + reason; console.error("SEATMAP_FAILED", reason); },
+      onSessionInitialized: () => console.log("SEATMAP_SESSION"),
+    };
+    try {
+      status.textContent = "creating chart";
+      new seatsio.SeatingChart(config).render();
+    } catch (error) {
+      status.textContent = "exception: " + error.message;
+      console.error("SEATMAP_EXCEPTION", error);
+    }
+  </script>
+</body>
+</html>

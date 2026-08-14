@@ -1,0 +1,33 @@
+============================================================
+FULL TICKET EXTRACTION FLOW TEST
+============================================================
+
+--- Testing: tickets-wwe-experience ---
+Step 1: Get tickets via discovery.get_event_tickets_live
+  Response keys: ['event_tickets', 'data']
+Step 2: extract_ticket_list()
+  Extracted 3 tickets
+  First ticket sample: {"_id": "65cb52bc23bdcf0bce0fe298", "shortcode": null, "title": "Package for 4 people", "description": "", "quantity": "1000000", "price": "100", "ori
+Step 3: ticket_has_available_inventory()
+  Active (available) tickets: 2
+  Available tickets:
+    - Package for 4 people: 100 SAR (remaining: 996426)
+    - GA Weekday: 32.609 SAR (remaining: 78087)
+Step 4: Direct API test
+  Direct - event_tickets: 3
+  Direct - ticket_packages: 0
+
+--- Testing: house-of-hype ---
+Step 1: Get tickets via discovery.get_event_tickets_live
+  Response keys: ['event_tickets', 'data']
+Step 2: extract_ticket_list()
+  Extracted 0 tickets
+Step 3: ticket_has_available_inventory()
+  Active (available) tickets: 0
+Step 4: Direct API test
+  Direct - event_tickets: 0
+  Direct - ticket_packages: 0
+
+============================================================
+TEST COMPLETE
+============================================================

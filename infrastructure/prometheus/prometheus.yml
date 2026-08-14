@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'webook_sniper'
+    static_configs:
+      - targets: ['app:8001']

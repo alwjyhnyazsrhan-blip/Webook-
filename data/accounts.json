@@ -1,0 +1,14 @@
+[
+    {
+        "id": "account_1",
+        "email": "user1@example.com",
+        "token": "BEARER_TOKEN_HERE",
+        "proxy": null
+    },
+    {
+        "id": "account_2",
+        "email": "user2@example.com",
+        "token": "BEARER_TOKEN_HERE",
+        "proxy": null
+    }
+]

@@ -1,0 +1,276 @@
+{
+  "events": {
+    "girls-cup-01": {
+      "id": 17,
+      "title": "Al Nassr vs Al Hilal",
+      "is_seated_meta": null,
+      "event_key": null,
+      "chart_key": null,
+      "seats_provider": "seats_io",
+      "stadium_map_url": null,
+      "metadata_json": {
+        "_id": "cf_Event_6LDmohRc7ohjePCwydr25K",
+        "slug": "girls-cup-01",
+        "title": "Al Nassr vs Al Hilal",
+        "status": "AVAILABLE",
+        "start_date_time": "2026-05-08T16:30:00.000+03:00",
+        "venue": "Al Nassr Club ",
+        "min_price": 10,
+        "image_url": "https://images.ctfassets.net/vy53kjqs34an/4Q8GXoZA7OThfehh4Y3S6d/2a84e39ab164e7c322b8bfc8bc2c71b7/1280---1280.jpg",
+        "contentful": {
+          "__typename": "Event",
+          "sys": {
+            "id": "6LDmohRc7ohjePCwydr25K"
+          },
+          "title": "Al Nassr vs Al Hilal",
+          "slug": "girls-cup-01",
+          "ticketingUrlSlug": "girls-cup-01",
+          "organizationSlug": null,
+          "startingPrice": 10,
+          "image11": {
+            "url": "https://images.ctfassets.net/vy53kjqs34an/4Q8GXoZA7OThfehh4Y3S6d/2a84e39ab164e7c322b8bfc8bc2c71b7/1280---1280.jpg"
+          },
+          "image31": {
+            "url": "https://images.ctfassets.net/vy53kjqs34an/4FDvJrHDkHiCLxw1myKJzt/c0407d29478e8a2b6b3266fdca98bbc7/1440px--480px.jpg"
+          },
+          "category": {
+            "title": "Sports",
+            "slug": "sports-event"
+          },
+          "location": {
+            "title": "Al Nassr Club ",
+            "city": "Riyadh",
+            "countryCode": "SA",
+            "cityCode": "RUH"
+          },
+          "schedule": {
+            "openDateTime": "2026-05-08T16:30:00.000+03:00",
+            "closeDateTime": "2026-05-08T18:30:00.000+03:00"
+          }
+        }
+      }
+    },
+    "girls-cup-02": {
+      "id": 18,
+      "title": "Al Qadsyah vs Al Itthad",
+      "is_seated_meta": null,
+      "event_key": null,
+      "chart_key": null,
+      "seats_provider": "seats_io",
+      "stadium_map_url": null,
+      "metadata_json": {
+        "_id": "cf_Event_7mhX4BSXNjY8gD1IlO9fZr",
+        "slug": "girls-cup-02",
+        "title": "Al Qadsyah vs Al Itthad",
+        "status": "AVAILABLE",
+        "start_date_time": "2026-05-08T18:30:00.000+03:00",
+        "venue": "Prince Saud bin Jalawi Stadium",
+        "min_price": 10,
+        "image_url": "https://images.ctfassets.net/vy53kjqs34an/NGPYX6KhFX2SpYnZ7cli3/4f61ecaf99f68938568f89a7b352baea/1280---1280.jpg",
+        "contentful": {
+          "__typename": "Event",
+          "sys": {
+            "id": "7mhX4BSXNjY8gD1IlO9fZr"
+          },
+          "title": "Al Qadsyah vs Al Itthad",
+          "slug": "girls-cup-02",
+          "ticketingUrlSlug": "girls-cup-02",
+          "organizationSlug": null,
+          "startingPrice": 10,
+          "image11": {
+            "url": "https://images.ctfassets.net/vy53kjqs34an/NGPYX6KhFX2SpYnZ7cli3/4f61ecaf99f68938568f89a7b352baea/1280---1280.jpg"
+          },
+          "image31": {
+            "url": "https://images.ctfassets.net/vy53kjqs34an/dB3oDIufxJp4iwul28338/193de154bdc26fdfb3aee9052565f668/1440px--480px.jpg"
+          },
+          "category": {
+            "title": "Sports",
+            "slug": "sports-event"
+          },
+          "location": {
+            "title": "Prince Saud bin Jalawi Stadium",
+            "city": "Khobar",
+            "countryCode": "SA",
+            "cityCode": "khb"
+          },
+          "schedule": {
+            "openDateTime": "2026-05-08T18:30:00.000+03:00",
+            "closeDateTime": "2026-05-08T20:30:00.000+03:00"
+          }
+        }
+      }
+    },
+    "girls-cup-03": {
+      "id": 19,
+      "title": "Al Hilal vs Al Nassr",
+      "is_seated_meta": null,
+      "event_key": null,
+      "chart_key": null,
+      "seats_provider": "seats_io",
+      "stadium_map_url": null,
+      "metadata_json": {
+        "_id": "cf_Event_3hXzfWcLyfHPvR9VAzuGKL",
+        "slug": "girls-cup-03",
+        "title": "Al Hilal vs Al Nassr",
+        "status": "AVAILABLE",
+        "start_date_time": "2026-05-15T16:30:00.000+03:00",
+        "venue": " Inaya College Stadium",
+        "min_price": 10,
+        "image_url": "https://images.ctfassets.net/vy53kjqs34an/1tDKnHZjptzKRSFX6Maxst/5d82a5c8e1454a9f40f0f87947a529f3/1280---1280.jpg",
+        "contentful": {
+          "__typename": "Event",
+          "sys": {
+            "id": "3hXzfWcLyfHPvR9VAzuGKL"
+          },
+          "title": "Al Hilal vs Al Nassr",
+          "slug": "girls-cup-03",
+          "ticketingUrlSlug": "girls-cup-03",
+          "organizationSlug": null,
+          "startingPrice": 10,
+          "image11": {
+            "url": "https://images.ctfassets.net/vy53kjqs34an/1tDKnHZjptzKRSFX6Maxst/5d82a5c8e1454a9f40f0f87947a529f3/1280---1280.jpg"
+          },
+          "image31": {
+            "url": "https://images.ctfassets.net/vy53kjqs34an/6ntPGwNes0P5QIs3Sjczla/027f2f794e0b37d33cafaf9e69b8a9c1/1440px--480px.jpg"
+          },
+          "category": {
+            "title": "Sports",
+            "slug": "sports-event"
+          },
+          "location": {
+            "title": " Inaya College Stadium",
+            "city": "Riyadh",
+            "countryCode": "SA",
+            "cityCode": "RUH"
+          },
+          "schedule": {
+            "openDateTime": "2026-05-15T16:30:00.000+03:00",
+            "closeDateTime": "2026-05-15T18:30:00.000+03:00"
+          }
+        }
+      }
+    },
+    "girls-cup-04": {
+      "id": 20,
+      "title": "Al Itthad vs Al Qadsyah",
+      "is_seated_meta": null,
+      "event_key": null,
+      "chart_key": null,
+      "seats_provider": "seats_io",
+      "stadium_map_url": null,
+      "metadata_json": {
+        "_id": "cf_Event_2xNGsN38iC6M2gUFFxJ2Fo",
+        "slug": "girls-cup-04",
+        "title": "Al Itthad vs Al Qadsyah",
+        "status": "AVAILABLE",
+        "start_date_time": "2026-05-15T18:30:00.000+03:00",
+        "venue": " Inaya College Stadium",
+        "min_price": 10,
+        "image_url": "https://images.ctfassets.net/vy53kjqs34an/2lIswODKdYXUpvIUY1Kymx/cb4fa29ac168fb0917c2501050781c36/1280---1280.jpg",
+        "contentful": {
+          "__typename": "Event",
+          "sys": {
+            "id": "2xNGsN38iC6M2gUFFxJ2Fo"
+          },
+          "title": "Al Itthad vs Al Qadsyah",
+          "slug": "girls-cup-04",
+          "ticketingUrlSlug": "girls-cup-04",
+          "organizationSlug": null,
+          "startingPrice": 10,
+          "image11": {
+            "url": "https://images.ctfassets.net/vy53kjqs34an/2lIswODKdYXUpvIUY1Kymx/cb4fa29ac168fb0917c2501050781c36/1280---1280.jpg"
+          },
+          "image31": {
+            "url": "https://images.ctfassets.net/vy53kjqs34an/EtRRktPIrBkSektCYtWoP/d7f23f1b853fcd9f37e468d3fa6465e1/1440px--480px.jpg"
+          },
+          "category": {
+            "title": "Sports",
+            "slug": "sports-event"
+          },
+          "location": {
+            "title": " Inaya College Stadium",
+            "city": "Riyadh",
+            "countryCode": "SA",
+            "cityCode": "RUH"
+          },
+          "schedule": {
+            "openDateTime": "2026-05-15T18:30:00.000+03:00",
+            "closeDateTime": "2026-05-15T20:30:00.000+03:00"
+          }
+        }
+      }
+    }
+  },
+  "tasks": [
+    {
+      "id": 22,
+      "slug": "girls-cup-02",
+      "status": "FAILED",
+      "error": "CHECKOUT_FAILED[plain]: Server Error",
+      "created_at": "2026-05-08T11:44:49.977718+00:00"
+    },
+    {
+      "id": 21,
+      "slug": "girls-cup-02",
+      "status": "FAILED",
+      "error": "CHECKOUT_FAILED[plain]: Server Error",
+      "created_at": "2026-05-07T21:58:21.821492+00:00"
+    },
+    {
+      "id": 20,
+      "slug": "girls-cup-01",
+      "status": "FAILED",
+      "error": "CHECKOUT_FAILED[plain]: Server Error",
+      "created_at": "2026-05-07T21:57:01.178267+00:00"
+    },
+    {
+      "id": 19,
+      "slug": "girls-cup-03",
+      "status": "CANCELLED",
+      "error": "TICKET_NOT_FOUND: 69f9c13b5c8795fad50bc7f1",
+      "created_at": "2026-05-07T21:56:20.361908+00:00"
+    },
+    {
+      "id": 18,
+      "slug": "girls-cup-03",
+      "status": "FAILED",
+      "error": "TICKET_NOT_FOUND: 69f9c13b5c8795fad50bc7f1",
+      "created_at": "2026-05-07T21:49:50.147502+00:00"
+    },
+    {
+      "id": 17,
+      "slug": "rsl-al-nassr-vs-al-hilal-25-26-a5v8h1k6a9d7",
+      "status": "FAILED",
+      "error": "HOLD_TOKEN_FAILED: {'_id': '686b8f3f07ef6ae4930cc73f', 'address': 'Alawwal Park', 'artists': [], 'away_team': {'_id': '651fdc90492867952e046ae2', 'logo': 'https://wbk-assets-backup.s3.eu-west-1.amazonaws.com/public/uploads/leauges/teams/al-hilal-1709237403.png', 'name'",
+      "created_at": "2026-05-07T21:42:30.299702+00:00"
+    },
+    {
+      "id": 16,
+      "slug": "richard-marx",
+      "status": "FAILED",
+      "error": "CHECKOUT_FAILED[seated]: تذاكر غير صالحة",
+      "created_at": "2026-05-07T21:41:39.112439+00:00"
+    },
+    {
+      "id": 15,
+      "slug": "rsl-25-26-neom-vs-al-shabab-11052026",
+      "status": "FAILED",
+      "error": "TICKET_NOT_FOUND: 69567303b5fa1a9b910fbcbc",
+      "created_at": "2026-05-07T21:24:06.789339+00:00"
+    },
+    {
+      "id": 14,
+      "slug": "spl-week-32-al-fayha-vs-al-qadsiah-2900",
+      "status": "CANCELLED",
+      "error": "TICKET_NOT_FOUND: 69e8df39948f464cb007d9bf",
+      "created_at": "2026-05-07T21:20:56.988362+00:00"
+    },
+    {
+      "id": 13,
+      "slug": "girls-cup-01",
+      "status": "CREATED",
+      "error": null,
+      "created_at": "2026-05-07T21:05:12.402745+00:00"
+    }
+  ]
+}

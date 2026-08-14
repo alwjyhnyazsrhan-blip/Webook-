@@ -1,0 +1,40 @@
+============================================================
+WEOOK LIVE API VALIDATION
+============================================================
+
+[TEST 1] Events from riyadh-season
+Status: 200
+Found 3 events
+  - house-of-hype: هاوس أوف هايب
+  - tickets-wwe-experience: تجربة دبليو دبليو إي
+  - test-event-child: Test event non seated - Child
+
+[TEST 2] Event Detail API
+Testing event: house-of-hype
+Status: 200
+Detail keys: ['_id', 'title', 'sub_title', 'slug', 'booking_seats_without_map', 'require_visa', 'logo', 'poster', 'promo_poster', 'mobile_poster', 'description', 'start_date_time', 'start_date_time_str', 'end_date_time', 'end_date_time_str', 'tbc', 'early_bird_qualifiers', 'early_bird_type', 'early_bird_message', 'early_bird_cta_title', 'early_bird_cta_link', 'early_bird_event_ticket', 'status', 'gender', 'is_experience', 'is_show', 'is_tabby', 'is_multibanco_enabled', 'venue_country', 'has_ticket_types', 'tabby_min_order_limit', 'is_checkout_enabled', 'type', 'category', 'webook_authors', 'card_discounts', 'has_consent', 'ticket_packages', 'send_tickets_later', 'send_tickets_date', 'url', 'tickets_external_link', 'informative_box', 'interests', 'tags', 'artists', 'event_sponsors', 'webook_shop_message', 'address', 'city', 'location', 'venue_name', 'digital_venue_id', 'venue_description', 'online_event', 'terms_and_conditions', 'event_start_price', 'event_start_price_vat', 'event_tickets', 'event_group', 'organization', 'currency', 'sport', 'seats_provider', 'is_seated', 'seats_io', 'seo', 'questions', 'home_team', 'away_team', 'channel_keys', 'has_ticket_holders', 'ticket_holder_title', 'event_order_limit', 'home_page_order', 'is_live_streaming', 'has_resale_tickets', 'contentful_entity_type', 'fees', 'tabby_fees', 'sponsors', 'has_addons', 'has_vouchers', 'vat_percent', 'is_restaurant', 'is_hybrid', 'restaurant_service_option', 'is_qitaf_enabled', 'is_wafacash_enabled', 'has_cf_turnstile', 'has_checkout_captcha', 'is_best_available_checkout', 'is_apple_pay_allowed', 'is_benefit_pay_allowed', 'is_stc_pay_allowed', 'is_managed_form_enabled', 'subscription_benefits', 'start_selling_date', 'enable_payment_methods', 'enable_primary_resell', 'enable_resell_filters', 'subscription_ticket_type_limits', 'subscription_enabled', 'booking_limit_subscription_plan_ids', 'season_logo', 'force_nafath', 'hasPerks', 'has_pre_requisite', 'payment_option', 'card_types', 'is_saudi_rewards_enabled', 'is_wallet_enabled', 'match_number', 'match_timing', 'event_order_type', 'second_match_number', 'second_match_timing', 'stadium_image', 'has_cross_selling_tickets', 'force_update', 'enable_notify_me', 'is_notify_me_enabled', 'notify_me_type', 'cross_selling_travel', 'cross_selling_travel_conditions', 'has_blacklists', 'instruction_title', 'instruction_subtitle', 'has_tiers', 'instruction_description', 'instruction_images', 'refund_guarantee_fee_config', 'is_allowed_refund_fee', 'enable_refund_guarantee', 'has_vat_number', 'is_soldout', 'time_slots', 'dubai_provider']
+event_tickets count: 0
+ticket_packages count: 0
+Venue: None
+
+[TEST 3] Sports Events (saudi-pro-league)
+Status: 404
+
+[TEST 4] Music Events (mdl-beast)
+Status: 404
+
+[TEST 5] All upcoming events
+riyadh-season: 3 events
+jeddah-season: 1 events
+diriyah-season: 0 events
+Total events across all orgs: 4
+
+[TEST 6] Find event with available tickets
+Found event with tickets: tickets-wwe-experience
+  - Package for 4 people: 100 SAR (remaining: 996426)
+  - GA Weekday: 32.609 SAR (remaining: 78087)
+  - GA Weekday - Walk In: 0 SAR (remaining: 98061)
+
+============================================================
+VALIDATION COMPLETE
+============================================================

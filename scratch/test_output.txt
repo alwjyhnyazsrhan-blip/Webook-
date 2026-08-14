@@ -1,0 +1,35 @@
+[REGISTRY_VIOLATION] Mutation REJECTED: msg 111 owned by TRACE_A
+[OWNERSHIP_BLOCK] Mutation rejected! chat=777 msg=111
+Attempted by: TRACE_B
+Owned by: TRACE_A
+Is Stale: False
+[REGISTRY_CALLBACK_REJECTED] Stale callback on msg 111
+[REGISTRY_OVERRIDE] Authoritative override detected!
+chat=777 msg=111
+New Trace: TRACE_C
+PREVIOUS Owner: TRACE_B
+Method: edit_text
+=== ADVERSARIAL TEST: STARTING ===
+
+[TEST 1] Heartbeat Recovery / Abandoned Flow
+Trace B trying to steal Trace A's message (should FAIL)...
+SUCCESS: Correctly blocked Trace B.
+Simulating Trace A abandonment (shrinking TTL for test)...
+Trace B trying again after abandonment (should SUCCEED)...
+SUCCESS: Correctly allowed Trace B recovery. New owner: TRACE_B
+
+[TEST 2] Tombstoned Callback Protection
+Validating callback on tombstoned message...
+SUCCESS: Correctly rejected callback on stale message.
+
+[TEST 3] Flight Recorder / Event Audit
+Recorded mutations: 2
+  0: trace=TRACE_A method=edit_text
+  1: trace=TRACE_B method=edit_text
+SUCCESS: Flight recorder captured mutation sequence.
+
+[TEST 4] Authoritative Override
+Trace C force-overriding Trace B...
+SUCCESS: Correctly allowed force override. Final owner: TRACE_C
+
+=== ADVERSARIAL TEST: COMPLETED ===

@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SeatCloud Render Test</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #111827; color: #f8fafc; font-family: Arial, sans-serif; }
+    #status { position: fixed; top: 8px; left: 8px; z-index: 10; background: rgba(0,0,0,.75); padding: 8px 10px; border-radius: 6px; font-size: 12px; max-width: 90vw; }
+    #seats-cloud-chart { width: 100vw; height: 100vh; }
+  </style>
+  <script src="https://chart.seatcloud.com/v1.0/chart.js"></script>
+</head>
+<body>
+  <div id="status">loading seatcloud</div>
+  <div id="seats-cloud-chart"></div>
+  <script>
+    const status = document.getElementById("status");
+    const config = {
+      divId: "seats-cloud-chart",
+      workspaceKey: "66e63c10464382fb1f049832",
+      event: "ab3cae88-b5fe-4976-a117-8bcc47b5b2a9",
+      chartKey: "da8c7b67-c470-45d9-a527-8bc285574911",
+      region: "eu",
+      language: "en",
+      showLegend: true,
+      showMinimap: true,
+      session: "none",
+      onChartRendered: () => { status.textContent = "rendered"; console.log("SEATCLOUD_RENDERED"); },
+      onChartRenderingFailed: (reason) => { status.textContent = "failed: " + JSON.stringify(reason); console.error("SEATCLOUD_FAILED", reason); },
+    };
+    try {
+      status.textContent = "creating chart";
+      window.seats.adapters.SIO(config).render();
+    } catch (error) {
+      status.textContent = "exception: " + error.message;
+      console.error("SEATCLOUD_EXCEPTION", error);
+    }
+  </script>
+</body>
+</html>

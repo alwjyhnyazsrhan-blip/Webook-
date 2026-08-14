@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: webookbot-app-1
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql+asyncpg://admin:admin@db:5432/webook
+      - REDIS_URL=redis://redis:6379/0
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+      - "8002:8002"
+    volumes:
+      - webook_data:/app/data
+    depends_on:
+      - redis
+      - db
+    networks:
+      - webook-network
+
+  worker:
+    build: .
+    container_name: webookbot-worker-1
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql+asyncpg://admin:admin@db:5432/webook
+      - REDIS_URL=redis://redis:6379/0
+    env_file:
+      - .env
+    command: python apps/worker/main.py
+    volumes:
+      - webook_data:/app/data
+    depends_on:
+      - redis
+      - app
+    networks:
+      - webook-network
+
+  redis:
+    image: redis:latest
+    container_name: webookbot-redis-1
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6380:6379"
+    networks:
+      - webook-network
+
+  db:
+    image: postgres:16-alpine
+    container_name: webookbot-db-1
+    environment:
+      - POSTGRES_DB=webook
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - webook-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: webookbot-prometheus-1
+    restart: always
+    volumes:
+      - ./infrastructure/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - webook-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: webookbot-grafana-1
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - webook-network
+
+networks:
+  webook-network:
+    driver: bridge
+
+volumes:
+  webook_data:
+  redis_data:
+  db_data:
+  grafana_data:
