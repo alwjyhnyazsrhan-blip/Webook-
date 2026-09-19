@@ -50,6 +50,7 @@ interface WebookBotRunnerProps {
     pricePerSeat: number;
     holdToken?: string;
   }) => void;
+  onOpenAccounts?: () => void;
 }
 
 interface BotLog {
@@ -66,6 +67,7 @@ export const WebookBotRunner: React.FC<WebookBotRunnerProps> = ({
   onAddToCart,
   cartSlugs = [],
   onOpenCheckout,
+  onOpenAccounts,
 }) => {
   const [selectedSlug, setSelectedSlug] = useState<string>(events[0]?.slug || "esports-world-cup-ewc-riyadh-2026");
   const [selectedSection, setSelectedSection] = useState<string>("all");
@@ -316,6 +318,7 @@ export const WebookBotRunner: React.FC<WebookBotRunnerProps> = ({
               selectedSlug={selectedSlug}
               onSelectEvent={onSelectEvent}
               onAddToCart={onAddToCart}
+              onOpenAccounts={onOpenAccounts}
             />
           </div>
         )}

@@ -51,6 +51,7 @@ interface WebookSplitCockpitProps {
   selectedSlug?: string;
   onSelectEvent?: (event: LiveEvent) => void;
   onAddToCart?: (event: LiveEvent) => void;
+  onOpenAccounts?: () => void;
 }
 
 export const WebookSplitCockpit: React.FC<WebookSplitCockpitProps> = ({
@@ -58,6 +59,7 @@ export const WebookSplitCockpit: React.FC<WebookSplitCockpitProps> = ({
   selectedSlug: initialSlug,
   onSelectEvent,
   onAddToCart,
+  onOpenAccounts,
 }) => {
   // Active Event
   const [currentSlug, setCurrentSlug] = useState<string>(
@@ -209,6 +211,30 @@ export const WebookSplitCockpit: React.FC<WebookSplitCockpitProps> = ({
       timestamp: "17:22:40",
     }
   ]);
+
+  // Load latest Webook accounts from API
+  useEffect(() => {
+    fetch("/api/accounts")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.accounts && data.accounts.length > 0) {
+          const mapped: SnipedAccount[] = data.accounts.map((a: any, idx: number) => ({
+            id: a.id,
+            email: a.email,
+            seats: a.allocated_seats && a.allocated_seats.length > 0
+              ? a.allocated_seats
+              : [`B4-${(idx % 8) + 1}-10`, `B4-${(idx % 8) + 1}-11`, `B4-${(idx % 8) + 1}-12`],
+            section: "B Side (B4)",
+            holdToken: a.hold_token || `wbk_hld_${a.token.substring(0, 18)}`,
+            expiresInSec: a.expires_in_sec || Math.max(120, 540 - idx * 30),
+            status: "LOCKED",
+            timestamp: `17:22:${10 + (idx * 3) % 50}`,
+          }));
+          setAccounts(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Telegram Live Messages
   const [tgMessages, setTgMessages] = useState<{
@@ -875,11 +901,21 @@ export const WebookSplitCockpit: React.FC<WebookSplitCockpitProps> = ({
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-black text-slate-300 flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5 text-pink-400" />
-                <span>حسابات القنص والمقاعد المحجوزة ({accounts.length})</span>
+                <span>حسابات Webook والمقاعد المحجوزة ({accounts.length})</span>
               </span>
-              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                ALL LOCKED ✅
-              </span>
+              <div className="flex items-center gap-2">
+                {onOpenAccounts && (
+                  <button
+                    onClick={onOpenAccounts}
+                    className="text-[11px] text-pink-400 hover:text-pink-300 font-bold flex items-center gap-1 hover:underline cursor-pointer bg-pink-500/10 hover:bg-pink-500/20 px-2 py-0.5 rounded-lg border border-pink-500/30 transition-all"
+                  >
+                    <span>تعديل الحسابات ⚙️</span>
+                  </button>
+                )}
+                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                  ALL LOCKED ✅
+                </span>
+              </div>
             </div>
 
             {/* List of Cards */}

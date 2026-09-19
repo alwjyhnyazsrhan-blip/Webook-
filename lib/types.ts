@@ -137,3 +137,23 @@ export interface BatchSniperResult {
   duration_ms: number;
   items: SniperCartItem[];
 }
+
+export type AccountStatus = "ACTIVE" | "LOGGED_IN" | "LOCKED" | "EXPIRED" | "DISABLED";
+
+export interface WebookAccount {
+  id: string;
+  email: string;
+  phone?: string;
+  password?: string;
+  token: string;
+  status: AccountStatus;
+  proxy?: string;
+  allocated_seats?: string[];
+  hold_token?: string;
+  expires_in_sec?: number;
+  last_used?: string;
+  name?: string;
+  notes?: string;
+  max_seats?: number;
+  created_at?: string;
+}

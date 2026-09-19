@@ -54,41 +54,50 @@ export const WebookHeroBar: React.FC<WebookHeroBarProps> = ({
 
   const featuredSlides = [
     {
-      title: "كأس العالم للرياضات الإلكترونية 2026",
-      subtitle: "ESPORTS WORLD CUP | JUL 6 - AUG 23",
-      tag: "تابع الإثارة الآن",
-      eventSlug: "esports-world-cup-ewc-riyadh-2026",
-      image: "https://picsum.photos/seed/ewc2026-hero/1200/600",
+      title: "دوري أبطال آسيا للنخبة: النصر ضد الشمال",
+      subtitle: "22 سبتمبر 2026 | استاد الأول بارك، الرياض - الساعة 8:00 مساءً",
+      tag: "يبدأ من 50 ر.س",
+      eventSlug: "afc-elite-26-27-al-nassr-vs-al-shamal-h6u2r7",
+      image: "https://picsum.photos/seed/nassr-shamal-afc/1200/600",
+      accent: "from-amber-950 via-slate-900 to-blue-950",
+      pill: "دوري أبطال آسيا للنخبة - مباشر",
+    },
+    {
+      title: "مدينة أكوارابيا المائية - القدية (Aquarabia)",
+      subtitle: "مفتوح يومياً 10:00 ص إلى 10:00 م | أكبر مدينة مائية بالشرق الأوسط",
+      tag: "يبدأ من 185 ر.س",
+      eventSlug: "aquarabia-qiddiya-tickets",
+      image: "https://picsum.photos/seed/aquarabia-qiddiya/1200/600",
+      accent: "from-cyan-950 via-slate-900 to-blue-950",
+      pill: "مدينة القدية الترفيهية",
+    },
+    {
+      title: "حفل الفنان عايض - احتفالات اليوم الوطني السعودي",
+      subtitle: "23 سبتمبر 2026 | مسرح محمد عبده أرينا - بوليفارد سيتي",
+      tag: "يبدأ من 175 ر.س",
+      eventSlug: "ayed-in-alriyadh-vocally-tickets-national-day",
+      image: "https://picsum.photos/seed/ayed-riyadh-national/1200/600",
+      accent: "from-emerald-950 via-slate-900 to-teal-950",
+      pill: "احتفالات اليوم الوطني 94",
+    },
+    {
+      title: "دوري روشن: النصر ضد القادسية",
+      subtitle: "18 أكتوبر 2026 | استاد الأول بارك، الرياض",
+      tag: "يبدأ من 35 ر.س",
+      eventSlug: "rsl-26-27-nassr-vs-al-qadsiah-d5g4z7t2",
+      image: "https://picsum.photos/seed/nassr-qadsiah/1200/600",
+      accent: "from-blue-950 via-slate-900 to-rose-950",
+      pill: "دوري روشن السعودي",
+    },
+    {
+      title: "سيكس فلاجز مدينة القدية (Six Flags Qiddiya)",
+      subtitle: "مفتوح يومياً 2:00 م إلى 11:30 م | عاصمة الترفيه والرياضة",
+      tag: "يبدأ من 195 ر.س",
+      eventSlug: "six-flags-new-2026",
+      image: "https://picsum.photos/seed/sixflags-qiddiya/1200/600",
       accent: "from-purple-950 via-slate-900 to-pink-950",
-      pill: "أضخم حدث في العالم"
+      pill: "أضخم ملاهي ترفيهية",
     },
-    {
-      title: "حفلة تامر عاشور - جدة",
-      subtitle: "27 أغسطس | مسرح عبادي الجوهر أرينا - Benchmark",
-      tag: "حجز فوري متاح",
-      eventSlug: "tamer-ashour-live-jeddah-concert-2026",
-      image: "https://picsum.photos/seed/tamer-hero/1200/600",
-      accent: "from-rose-950 via-slate-900 to-amber-950",
-      pill: "ليلة طربية لا تُنسى"
-    },
-    {
-      title: "صوت مصر الفنانة أنغام - جدة",
-      subtitle: "14 أغسطس | مسرح عبادي الجوهر أرينا",
-      tag: "حجز فوري متاح",
-      eventSlug: "angham-live-jeddah-concert-2026",
-      image: "https://picsum.photos/seed/angham-hero/1200/600",
-      accent: "from-pink-950 via-slate-900 to-blue-950",
-      pill: "حفل استثنائي"
-    },
-    {
-      title: "European Le Mans Series 2026",
-      subtitle: "9 إلى 10 أكتوبر 2026 | بورتيماو، البرتغال - 47 سيارة",
-      tag: "يبدأ من 34.61 ر.س",
-      eventSlug: "european-le-mans-series-2026-portimao",
-      image: "https://picsum.photos/seed/lemans-hero/1200/600",
-      accent: "from-blue-950 via-slate-900 to-emerald-950",
-      pill: "سباق عالمي"
-    }
   ];
 
   const slide = featuredSlides[currentSlide];

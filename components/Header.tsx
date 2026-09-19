@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Zap, RefreshCw, Download, Activity, CheckCircle2, Globe, ExternalLink, ShieldCheck, Key, ShoppingCart, Flame } from "lucide-react";
+import { Zap, RefreshCw, Download, Activity, CheckCircle2, Globe, ExternalLink, ShieldCheck, Key, ShoppingCart, Flame, Users } from "lucide-react";
 import { formatTime } from "@/lib/utils";
 
 interface HeaderProps {
@@ -11,6 +11,8 @@ interface HeaderProps {
   lastSyncTime: string;
   cartCount?: number;
   onOpenCart?: () => void;
+  onOpenAccounts?: () => void;
+  accountsCount?: number;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -20,6 +22,8 @@ export const Header: React.FC<HeaderProps> = ({
   lastSyncTime,
   cartCount = 0,
   onOpenCart,
+  onOpenAccounts,
+  accountsCount = 5,
 }) => {
   const [copiedNotification, setCopiedNotification] = useState(false);
   const [isBridgeModalOpen, setIsBridgeModalOpen] = useState(false);
@@ -98,6 +102,21 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             </div>
           </button>
+
+          {/* Webook Accounts Management Button */}
+          {onOpenAccounts && (
+            <button
+              onClick={onOpenAccounts}
+              className="px-3.5 py-2.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/40 text-purple-200 font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+              title="إدارة وتعديل حسابات Webook"
+            >
+              <Users className="w-4 h-4 text-purple-400" />
+              <span>حسابات Webook</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-purple-600 text-white font-black">
+                {accountsCount}
+              </span>
+            </button>
+          )}
 
           {/* Sniper Cart Button */}
           {onOpenCart && (

@@ -1,4 +1,4 @@
-import { LiveEvent, Genre, ReservationTask, IngestionStats, SeatSection } from './types';
+import { LiveEvent, Genre, ReservationTask, IngestionStats, SeatSection, WebookAccount } from './types';
 
 export const initialGenres: Genre[] = [
   { id: 1, name_ar: "كأس العالم للرياضات الإلكترونية", name_en: "Esports World Cup (EWC)", slug: "ewc", is_active: true, event_count: 12 },
@@ -1373,11 +1373,98 @@ export const initialTasks: ReservationTask[] = [
   }
 ];
 
+export const initialAccounts: WebookAccount[] = [
+  {
+    id: "acc-1",
+    email: "mamasaad@hotmail.com",
+    name: "سعد القحطاني",
+    phone: "+966 50 123 4567",
+    password: "••••••••••••",
+    token: "wbk_live_6a4a15b3c767e7c91f3851230869a",
+    status: "LOCKED",
+    proxy: "185.193.64.12:8080:ksa_p01:pwd99",
+    allocated_seats: ["B4-7-13", "B4-7-14", "B4-7-15", "B4-7-16", "B4-7-17"],
+    hold_token: "6a4a15b3c767e7c91f3851230869a",
+    expires_in_sec: 540,
+    max_seats: 5,
+    notes: "حساب رئيسي لحجز مباريات دوري أبطال آسيا",
+    created_at: "2026-09-01T10:00:00Z",
+    last_used: new Date().toISOString(),
+  },
+  {
+    id: "acc-2",
+    email: "haydafah@gmail.com",
+    name: "هيفاء العتيبي",
+    phone: "+966 55 987 6543",
+    password: "••••••••••••",
+    token: "wbk_live_8ef4ef7ecc1bc2ff3098319eac71b",
+    status: "LOCKED",
+    proxy: "185.193.64.13:8080:ksa_p02:pwd99",
+    allocated_seats: ["B4-7-13", "B4-7-14", "B4-7-15", "B4-7-16", "B4-7-17"],
+    hold_token: "8ef4ef7ecc1bc2ff3098319eac71b",
+    expires_in_sec: 512,
+    max_seats: 5,
+    notes: "حساب فعاليات القدية وحفلات موسم الرياض",
+    created_at: "2026-09-02T14:30:00Z",
+    last_used: new Date().toISOString(),
+  },
+  {
+    id: "acc-3",
+    email: "denmahal@gmail.com",
+    name: "دانه المحال",
+    phone: "+966 54 332 1100",
+    password: "••••••••••••",
+    token: "wbk_live_7a14df90be781b2f0a149021e0021",
+    status: "LOCKED",
+    proxy: "185.193.64.14:8080:ksa_p03:pwd99",
+    allocated_seats: ["B4-1-18", "B4-1-19", "B4-1-20", "B4-1-21"],
+    hold_token: "7a14df90be781b2f0a149021e",
+    expires_in_sec: 490,
+    max_seats: 4,
+    notes: "حساب جاهز للقنص المباشر لمباريات النصر",
+    created_at: "2026-09-05T09:15:00Z",
+    last_used: new Date().toISOString(),
+  },
+  {
+    id: "acc-4",
+    email: "salmasou@gmail.com",
+    name: "سلمى السبيعي",
+    phone: "+966 56 778 8990",
+    password: "••••••••••••",
+    token: "wbk_live_2a94abcc31804e76a94821a8812c",
+    status: "LOCKED",
+    proxy: "185.193.64.15:8080:ksa_p04:pwd99",
+    allocated_seats: ["B4-5-3", "B4-5-4", "B4-5-5", "B4-5-6"],
+    hold_token: "2a94abcc31804e76a94821a",
+    expires_in_sec: 460,
+    max_seats: 4,
+    notes: "حساب حفلات اليوم الوطني والمسارح",
+    created_at: "2026-09-10T12:00:00Z",
+    last_used: new Date().toISOString(),
+  },
+  {
+    id: "acc-5",
+    email: "turki_sniper@webook.sa",
+    name: "تركي الدوسري",
+    phone: "+966 50 554 4332",
+    password: "••••••••••••",
+    token: "wbk_live_948a201fe83fca38914b10091",
+    status: "ACTIVE",
+    proxy: "185.193.64.16:8080:ksa_p05:pwd99",
+    allocated_seats: [],
+    max_seats: 6,
+    notes: "حساب خامل جاهز لربطه بأي فعالية جديدة فور طرحها",
+    created_at: "2026-09-12T16:40:00Z",
+    last_used: new Date().toISOString(),
+  },
+];
+
 // In-Memory Database Store for Dynamic Operations
 class DatabaseStore {
   public genres: Genre[] = [...initialGenres];
   public events: LiveEvent[] = [...initialEvents];
   public tasks: ReservationTask[] = [...initialTasks];
+  public accounts: WebookAccount[] = [...initialAccounts];
   public lastSyncTime: string = new Date().toISOString();
   public workerStatus = {
     active: true,
@@ -1385,6 +1472,60 @@ class DatabaseStore {
     lastSync: new Date().toISOString(),
     status: "HEALTHY",
   };
+
+  public getAccounts(): WebookAccount[] {
+    return this.accounts;
+  }
+
+  public getAccountById(id: string): WebookAccount | undefined {
+    return this.accounts.find((a) => a.id === id);
+  }
+
+  public createAccount(data: Partial<WebookAccount>): WebookAccount {
+    const newAcc: WebookAccount = {
+      id: data.id || `acc-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      email: data.email || `user_${Date.now()}@webook.com`,
+      name: data.name || data.email?.split("@")[0] || "حساب Webook",
+      phone: data.phone || "+966 50 000 0000",
+      password: data.password || "••••••••••••",
+      token: data.token || `wbk_live_${Math.random().toString(36).substring(2, 16)}`,
+      status: data.status || "ACTIVE",
+      proxy: data.proxy || "185.193.64.10:8080",
+      allocated_seats: data.allocated_seats || [],
+      hold_token: data.hold_token,
+      expires_in_sec: data.expires_in_sec || 900,
+      max_seats: data.max_seats || 4,
+      notes: data.notes || "",
+      created_at: new Date().toISOString(),
+      last_used: new Date().toISOString(),
+    };
+    this.accounts.unshift(newAcc);
+    return newAcc;
+  }
+
+  public updateAccount(id: string, updates: Partial<WebookAccount>): WebookAccount | null {
+    const acc = this.accounts.find((a) => a.id === id);
+    if (!acc) return null;
+    Object.assign(acc, updates, { last_used: new Date().toISOString() });
+    return acc;
+  }
+
+  public deleteAccount(id: string): boolean {
+    const idx = this.accounts.findIndex((a) => a.id === id);
+    if (idx === -1) return false;
+    this.accounts.splice(idx, 1);
+    return true;
+  }
+
+  public batchImportAccounts(items: Partial<WebookAccount>[]): WebookAccount[] {
+    const created: WebookAccount[] = [];
+    for (const item of items) {
+      if (item.email) {
+        created.push(this.createAccount(item));
+      }
+    }
+    return created;
+  }
 
   public addTask(taskData: Partial<ReservationTask>): ReservationTask {
     return this.createTask(taskData);
@@ -1553,4 +1694,9 @@ class DatabaseStore {
   }
 }
 
-export const dbStore = new DatabaseStore();
+declare global {
+  var __webook_db_store: DatabaseStore | undefined;
+}
+
+export const dbStore = globalThis.__webook_db_store || new DatabaseStore();
+globalThis.__webook_db_store = dbStore;

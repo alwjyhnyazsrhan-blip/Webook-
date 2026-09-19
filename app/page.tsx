@@ -21,10 +21,12 @@ import { SniperCartFloatingBar } from "@/components/SniperCartFloatingBar";
 import { WebookStorefrontSimulator } from "@/components/WebookStorefrontSimulator";
 import { WebookCheckoutModal } from "@/components/WebookCheckoutModal";
 import { CloudflareCookieManager } from "@/components/CloudflareCookieManager";
-import { Search, Filter, Layers, ListOrdered, Cpu, CheckCircle, Crosshair, Sparkles, MonitorPlay, Cookie } from "lucide-react";
+import { WebookAccountManager } from "@/components/WebookAccountManager";
+import { Search, Filter, Layers, ListOrdered, Cpu, CheckCircle, Crosshair, Sparkles, MonitorPlay, Cookie, Users } from "lucide-react";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<"bot" | "simulator" | "discovery" | "tasks" | "taxonomy" | "worker" | "cookies">("simulator");
+  const [activeTab, setActiveTab] = useState<"bot" | "simulator" | "discovery" | "tasks" | "taxonomy" | "worker" | "cookies" | "accounts">("simulator");
+  const [accountsCount, setAccountsCount] = useState<number>(5);
   const [events, setEvents] = useState<LiveEvent[]>(initialEvents);
   const [genres, setGenres] = useState<Genre[]>(initialGenres);
   const [tasks, setTasks] = useState<ReservationTask[]>(initialTasks);
@@ -357,6 +359,22 @@ export default function Home() {
     }
   };
 
+  const fetchAccountsCount = async () => {
+    try {
+      const res = await fetch("/api/accounts");
+      const data = await res.json();
+      if (data.accounts) {
+        setAccountsCount(data.accounts.length);
+      }
+    } catch {
+      // Ignore
+    }
+  };
+
+  useEffect(() => {
+    fetchAccountsCount();
+  }, []);
+
   const handleQuickBotTarget = (slug: string) => {
     const target = events.find((e) => e.slug === slug);
     if (target) {
@@ -385,6 +403,8 @@ export default function Home() {
           lastSyncTime={lastSyncTime}
           cartCount={cartItems.length}
           onOpenCart={() => setIsCartOpen(true)}
+          onOpenAccounts={() => setActiveTab("accounts")}
+          accountsCount={accountsCount}
         />
 
         {/* Webook Official Hero Carousel & Categories Bar */}
@@ -409,6 +429,7 @@ export default function Home() {
           onAddToCart={handleAddToCart}
           cartSlugs={cartItems.map((c) => c.event_slug)}
           onOpenCheckout={(data) => setActiveCheckout(data)}
+          onOpenAccounts={() => setActiveTab("accounts")}
         />
 
         {/* Key Metrics */}
@@ -441,13 +462,29 @@ export default function Home() {
               onClick={() => setActiveTab("bot")}
               className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
                 activeTab === "bot"
-                  ? "bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-lg shadow-pink-500/20"
+                  ? "bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-lg shadow-pink-500/20 font-black"
                   : "text-slate-400 hover:text-white hover:bg-slate-800/50"
               }`}
             >
               <Crosshair className="w-4 h-4" />
               <span>قناص Webook الآلي</span>
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            </button>
+
+            <button
+              id="tab-accounts"
+              onClick={() => setActiveTab("accounts")}
+              className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer shrink-0 ${
+                activeTab === "accounts"
+                  ? "bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white shadow-lg shadow-purple-500/25 font-black"
+                  : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+              }`}
+            >
+              <Users className="w-4 h-4 text-purple-400" />
+              <span>إدارة وتعديل الحسابات</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] bg-purple-500/20 text-purple-300 font-mono font-bold">
+                {accountsCount} حسابات
+              </span>
             </button>
 
             <button
@@ -727,6 +764,18 @@ export default function Home() {
               showToast("✓ تم حفظ وتحديث كوكيز Cloudflare وجلسة Webook بنجاح!");
             }}
           />
+        )}
+
+        {activeTab === "accounts" && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            <WebookAccountManager
+              onAccountsUpdated={fetchAccountsCount}
+              onAccountSelectForBot={(acc) => {
+                showToast(`✓ تم اختيار حساب (${acc.email}) للبوت`);
+                setActiveTab("bot");
+              }}
+            />
+          </div>
         )}
       </div>
 
