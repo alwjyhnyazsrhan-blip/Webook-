@@ -1,0 +1,8 @@
+{
+  "name": "Webook Ingestion Platform",
+  "description": "منصة وبوت قنص ومزامنة فعاليات وتذاكر Webook.com اللحظية مع تجاوز طوابير الانتظار وحجز المقاعد المؤكد",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
