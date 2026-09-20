@@ -1,5 +1,7 @@
 import { LiveEvent, Genre, ReservationTask, IngestionStats, SeatSection, WebookAccount } from './types';
 
+export const STATIC_SEED_TIME = "2026-09-20T12:00:00.000Z";
+
 export const initialGenres: Genre[] = [
   { id: 1, name_ar: "كأس العالم للرياضات الإلكترونية", name_en: "Esports World Cup (EWC)", slug: "ewc", is_active: true, event_count: 12 },
   { id: 2, name_ar: "الحفلات والموسيقى", name_en: "Concerts & Music", slug: "concerts", is_active: true, event_count: 16 },
@@ -35,7 +37,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_ewc_2026",
     chart_key: "seatcloud_ewc_boulevard",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "الحدث الأضخم تاريخياً في عالم الجيمينج والرياضات الإلكترونية بجوائز تفوق 60 مليون دولار وأكثر من 22 بطولة في بوليفارد رياض سيتي.",
     sections: [
       { id: "sec_ewc_day", name: "تذكرة دخول يومية (Day Pass)", category_name: "General Admission", price: 20, available_seats: 1450, total_seats: 6000, color: "#3b82f6" },
@@ -65,7 +67,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_tamer_ashour_jeddah",
     chart_key: "seatcloud_abadi_arena",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "فعالية 27 أغسطس، فتح الأبواب 8:30، بداية الحفل 9:30 مساءً في جدة برعاية الهيئة العامة للترفيه وتنظيم Benchmark.",
     sections: [
       { id: "sec_ta_bronze", name: "الدرجة الفضية (Silver Grandstand)", category_name: "Silver Tier", price: 375, available_seats: 85, total_seats: 1200, color: "#64748b" },
@@ -95,7 +97,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_angham_jeddah",
     chart_key: "seatcloud_abadi_arena",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "فعالية 14 أغسطس، فتح الأبواب: 8:30 مساءً، بداية الحفل: 9:30 مساءً - جدة، المملكة العربية السعودية. ليلة طربية استثنائية مع صوت مصر.",
     sections: [
       { id: "sec_ang_c3", name: "الدرجة الفضية (Silver)", category_name: "Silver", price: 375, available_seats: 42, total_seats: 1200, color: "#64748b" },
@@ -125,7 +127,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_elms_portimao",
     chart_key: "seatcloud_elms",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "فعالية 9 أكتوبر إلى 10 أكتوبر 2026 - بورتيماو، البرتغال. 47 سيارة و6 سباقات لومان الأسطورية مع حجز فوري حصري عبر Webook.",
     sections: [
       { id: "sec_elms_gen", name: "تذكرة دخول عام للسباق (General Entry)", category_name: "General Admission", price: 34.61, available_seats: 1200, total_seats: 5000, color: "#3b82f6" },
@@ -154,7 +156,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_f1_madrid_2026",
     chart_key: "seatcloud_f1_madrid",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "بطولة الجائزة الكبرى للفورمولا 1 تاغ هوير في مدريد، إسبانيا. تذاكر رسمية ومباشرة عبر Webook العالمية.",
     sections: [
       { id: "sec_f1_gen", name: "دخول عام للمدرج المفتوح (General Entry)", category_name: "Pelousse General", price: 50, available_seats: 2400, total_seats: 10000, color: "#3b82f6" },
@@ -183,7 +185,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_ac_milan_san_siro",
     chart_key: "seatcloud_san_siro",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "تذاكر مباريات نادي إي سي ميلان في الدوري الإيطالي ودوري أبطال أوروبا على ملعب سان سيرو التاريخي بميلانو حصرياً على Webook.",
     sections: [
       { id: "sec_mil_curva", name: "مدرج كورفا سود (Curva Sud)", category_name: "Curva Sud Fan Zone", price: 50, available_seats: 650, total_seats: 12000, color: "#64748b" },
@@ -212,7 +214,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_myazu_via",
     chart_key: "seatcloud_myazu",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "مطعم ميازو الراقي في فيا رياض يقدم فن الطهي الياباني المعاصر، حجز فوري ومضمون مع باقات الطاولات الحصرية.",
     sections: [
       { id: "sec_my_dep", name: "تأكيد حجز طاولة لشخصين", category_name: "Table Deposit (2 Guests)", price: 50, available_seats: 14, total_seats: 40, color: "#3b82f6" },
@@ -241,7 +243,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_ferdi_via",
     chart_key: "seatcloud_ferdi",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "المطعم الباريسي الشهير فيردي في فيا رياض مع أطباق البرغر المميزة والمقبلات الفرنسية، حجز فوري فائق السرعة عبر Webook.",
     sections: [
       { id: "sec_fr_tbl", name: "حجز طاولة داخلية لشخصين", category_name: "Indoor Table for 2", price: 50, available_seats: 18, total_seats: 50, color: "#3b82f6" },
@@ -270,7 +272,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_vega_via",
     chart_key: "seatcloud_vega",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "لاونج فيغا الفاخر في فيا رياض لعشاق الأجواء الراقية والمشروبات الفاخرة، حجز فوري للمقاعد واللاونج الخاص.",
     sections: [
       { id: "sec_vg_entry", name: "حجز جلسة لاونج للأفراد (Lounge Access)", category_name: "Lounge Seat Pass", price: 200, available_seats: 12, total_seats: 35, color: "#eab308" },
@@ -298,7 +300,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_sixkings_venue_2026",
     chart_key: "seatcloud_sixkings_venue",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "أقوى بطولة تنس استعراضية في العالم تجمع نخبة أساطير التنس: نوفاك ديوكوفيتش، رافاييل نادال، كارلوس ألكاراز، ويانيك سينر في أرينا ذا فينيو بموسم الرياض.",
     sections: [
       { id: "sec_upper", name: "المدرجات العلوية - Upper Deck", category_name: "Cat 3 Grandstand", price: 150, available_seats: 380, total_seats: 1500, color: "#64748b" },
@@ -328,7 +330,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_blvd_world_all",
     chart_key: "seatcloud_blvd_world",
     seats_provider: "general_admission",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "استكشف 14 دولة وثقافة عالمية في مكان واحد: إيطاليا، فرنسا، المكسيك، اليونان، بريطانيا، اليابان، ومصر مع أكبر بحيرة اصطناعية وتلفريك في العالم.",
     sections: [
       { id: "sec_entry_gen", name: "تذكرة دخول عام (أيام الأسبوع)", category_name: "Weekday Entry", price: 30, available_seats: 2500, total_seats: 8000, color: "#3b82f6" },
@@ -358,7 +360,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_wonder_garden",
     chart_key: "seatcloud_wonder_garden",
     seats_provider: "general_admission",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "مدينة ملاهي خيالية متكاملة تضم 3 مناطق رئيسية: حديقة الفراشات، الحديقة السحرية، وشجرة الحياة مع أكثر من 65 لعبة وتجربة حية.",
     sections: [
       { id: "sec_wg_gen", name: "تذكرة دخول عام", category_name: "General Admission", price: 35, available_seats: 1800, total_seats: 6000, color: "#3b82f6" },
@@ -387,7 +389,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_suwaidi",
     chart_key: "seatcloud_suwaidi",
     seats_provider: "general_admission",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "تستضيف حديقة السويدي 9 ثقافات عالمية أسبوعية تستعرض الفنون الشعبية والمأكولات والأزياء التقليدية من الفلبين، الهند، إندونيسيا، مصر، وغيرها.",
     sections: [
       { id: "sec_sw_entry", name: "تذكرة دخول الفعاليات", category_name: "Standard Entry", price: 15, available_seats: 3200, total_seats: 8000, color: "#10b981" },
@@ -415,7 +417,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_awaleen",
     chart_key: "seatcloud_awaleen",
     seats_provider: "general_admission",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "رحلة تسوق تراثية إلى نجد القديمة في حقبة السبعينيات مع أكبر دكاكين للحرف اليدوية والمأكولات الشعبية وتجربة سوق الحراج الحية.",
     sections: [
       { id: "sec_aw_entry", name: "تذكرة دخول السوق", category_name: "Market Access", price: 20, available_seats: 2100, total_seats: 5000, color: "#eab308" },
@@ -445,7 +447,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_kingdom_arena_derby",
     chart_key: "seatcloud_ka_derby",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "قمة القمم الكروية في ديربي العاصمة المشتعل بين الهلال والنصر بكامل نجومهم العالميين على ملعب المملكة أرينا المغلق بتغطية Webook الرسمية.",
     sections: [
       { id: "sec_cat3", name: "الدرجة الثالثة (خلف المرمى - رابطة المشجعين)", category_name: "Cat 3 Behind Goal", price: 35, available_seats: 420, total_seats: 4000, color: "#64748b" },
@@ -475,7 +477,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_jawhara_derby",
     chart_key: "seatcloud_jawhara",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "كلاسيكو وديربي جدة التاريخي على مدرجات الجوهرة المشعة بحضور أكثر من 60 ألف مشجع وبنزيمة ومحرز وفيرمينو وكانتي.",
     sections: [
       { id: "sec_j_upper", name: "الدرجة الموحدة (المدرج العلوي)", category_name: "Unified Upper Tier", price: 30, available_seats: 1200, total_seats: 25000, color: "#64748b" },
@@ -505,7 +507,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_awwal_damac",
     chart_key: "seatcloud_awwal_park",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "مباراة النصر بقيادة كريستيانو رونالدو وساديو ماني ضد فريق ضمك في الجولة القادمة على أرضية ملعب الأول بارك.",
     sections: [
       { id: "sec_ap_cat3", name: "الدرجة الثالثة (شمال / جنوب)", category_name: "Cat 3 Behind Goal", price: 30, available_seats: 580, total_seats: 5000, color: "#64748b" },
@@ -534,7 +536,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_spl_qadsiah_906720",
     chart_key: "seatcloud_qadsiah",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "مواجهة قوية ضمن منافسات دوري روشن السعودي بين فرسان القادسية وبحارة الخليج على استاد الأمير محمد بن فهد.",
     sections: [
       { id: "sec_gen", name: "المدرجات العامة (عائلات وأفراد)", category_name: "General Admission", price: 25, available_seats: 850, total_seats: 5000, color: "#3b82f6" },
@@ -563,7 +565,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_raed_orobah",
     chart_key: "seatcloud_buraidah",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "تذاكر مباراة نادي الرائد ضد نادي العروبة ضمن الجولة الرسمية لدوري روشن السعودي للمحترفين بمدينة الملك عبدالله الرياضية.",
     sections: [
       { id: "sec_gen", name: "المدرجات العامة (عائلات وأفراد)", category_name: "General Admission", price: 20, available_seats: 950, total_seats: 4000, color: "#3b82f6" },
@@ -591,7 +593,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_ett_itt",
     chart_key: "seatcloud_ettifaq",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "مواجهة كبرى في الشرقية تجمع الاتفاق مع العميد نادي الاتحاد في لقاء حاسم على استاد نادي الاتفاق الجديد بالدمام.",
     sections: [
       { id: "sec_ett_gen", name: "المدرج الموحد (جمهور الاتفاق / الاتحاد)", category_name: "Standard Tier", price: 35, available_seats: 600, total_seats: 7000, color: "#3b82f6" },
@@ -620,7 +622,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_okhdood_shabab",
     chart_key: "seatcloud_najran",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "مباراة نادي الأخدود مع ضيفه نادي الشباب في دوري روشن السعودي للمحترفين بمدينة الأمير هذلول بنجران.",
     sections: [
       { id: "sec_gen", name: "الدرجة الموحدة", category_name: "General Admission", price: 20, available_seats: 750, total_seats: 5000, color: "#3b82f6" },
@@ -648,7 +650,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_qadsiah_season",
     chart_key: "seatcloud_qadsiah_season",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "احجز مقعدك الدائم طوال الموسم لجميع مباريات القادسية على أرضه في دوري روشن وكأس خادم الحرمين الشريفين مع مزايا حصرية للأعضاء.",
     sections: [
       { id: "sec_season_gen", name: "المقعد الموسمي العام", category_name: "Seasonal General", price: 250, available_seats: 450, total_seats: 2000, color: "#3b82f6" },
@@ -679,7 +681,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_assala_rs",
     chart_key: "seatcloud_abdo_arena",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "ليلة طربية ساحرة مع أيقونة الشرق أصالة نصري تقدم فيها باقة من أروع أغانيها الخليجية والعربية برفقة الفرقة الموسيقية الكبرى.",
     sections: [
       { id: "sec_bronze", name: "البرونزية - المدرج العلوي", category_name: "Bronze Balcony", price: 250, available_seats: 95, total_seats: 1200, color: "#cd7f32" },
@@ -709,7 +711,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_abdo_arena_live",
     chart_key: "seatcloud_abdo_arena",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "حفل طربي استثنائي مع فنان العرب محمد عبده برفقة أوركسترا موسيقية عالمية بقيادة المايسترو وليد فايد.",
     sections: [
       { id: "sec_bronze", name: "البرونزية - المدرج العلوي", category_name: "Bronze Balcony", price: 300, available_seats: 85, total_seats: 1200, color: "#cd7f32" },
@@ -739,7 +741,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_mdlbeast_soundstorm",
     chart_key: "seatcloud_mdlbeast",
     seats_provider: "general_admission",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "أضخم مهرجان موسيقي في الشرق الأوسط بمشاركة أكثر من 200 دي جي وفنان عالمي وعربي عبر 8 مسارح عملاقة في بنبان.",
     sections: [
       { id: "sec_storm_ga", name: "تذكرة ستورم اليومية (GA)", category_name: "General Admission Storm", price: 199, available_seats: 1400, total_seats: 15000, color: "#3b82f6" },
@@ -769,7 +771,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_beast_house",
     chart_key: "seatcloud_beast_house",
     seats_provider: "general_admission",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "أمسيات موسيقية إلكترونية حصرية في أول نادي موسيقي خاص للمبدعين وعشاق الموسيقى الإيقاعية في حي جاكس الدرعية.",
     sections: [
       { id: "sec_bh_entry", name: "تذكرة دخول عام (Club Access)", category_name: "General Admission", price: 150, available_seats: 140, total_seats: 400, color: "#3b82f6" },
@@ -797,7 +799,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_yemeni_moc",
     chart_key: "seatcloud_kfcc",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "أمسية أوركسترالية فريدة تستعرض روائع التراث والموسيقى اليمنية بمشاركة كبار العازفين والمنشدين برعاية وزارة الثقافة.",
     sections: [
       { id: "sec_balcony", name: "الشرفة العلوية", category_name: "Balcony", price: 120, available_seats: 120, total_seats: 600, color: "#64748b" },
@@ -826,7 +828,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_ff_symphony",
     chart_key: "seatcloud_ffxiv",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "أوركسترا حية ضخمة تعزف المقطوعات الأيقونية للعبة Final Fantasy بمصاحبة شاشات عرض عملاقة ومشاهد ملحمية.",
     sections: [
       { id: "sec_upper", name: "المدرج العلوي", category_name: "Upper Tier", price: 150, available_seats: 190, total_seats: 800, color: "#64748b" },
@@ -857,7 +859,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_wwe_crownjewel_26",
     chart_key: "seatcloud_wwe_superdome",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "أضخم عروض المصارعة الحرة العالمية من WWE بمشاركة كودي رودز، رومان رينز، سيث رولينز، وجون سينا على أحزمة العالم.",
     sections: [
       { id: "sec_upper", name: "المدرجات العلوية - Upper Deck", category_name: "Tier 3", price: 130, available_seats: 290, total_seats: 2500, color: "#64748b" },
@@ -886,7 +888,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_pfl_finals",
     chart_key: "seatcloud_pfl",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "ليلة النزالات العالمية الكبرى في رياضة MMA لتتويج أبطال العالم لـ 6 فئات أوزان مختلفة بجوائز تتجاوز ملايين الدولارات.",
     sections: [
       { id: "sec_pfl_ga", name: "المدرج العام", category_name: "Tier 2 Seating", price: 120, available_seats: 340, total_seats: 2000, color: "#3b82f6" },
@@ -915,7 +917,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_f1_jeddah_2027",
     chart_key: "seatcloud_f1_jeddah",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "أسرع حلبة شوارع في العالم تشهد أقوى سباقات السرعة والإثارة لسيارات الفورمولا 1 بمشاركة أبطال العالم وحفلات غنائية مصاحبة.",
     sections: [
       { id: "sec_ga", name: "الدخول العام (General Admission)", category_name: "General Admission", price: 250, available_seats: 800, total_seats: 5000, color: "#3b82f6" },
@@ -944,7 +946,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_jcsa_race",
     chart_key: "seatcloud_jcsa",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "أقوى سباقات الخيل والفروسية السعودية تحت إشراف نادي سباقات الخيل (JCSA) في أجواء عائلية وتراثية فاخرة.",
     sections: [
       { id: "sec_jcsa_gen", name: "تذكرة الدخول العام للمدرجات", category_name: "Grandstand Entry", price: 25, available_seats: 1200, total_seats: 5000, color: "#3b82f6" },
@@ -973,7 +975,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_saudicup",
     chart_key: "seatcloud_saudicup",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "أغلى سباق خيل في العالم بجوائز تبلغ 37.5 مليون دولار مع عروض أزياء تراثية وأرقى تجارب الضيافة النجدية.",
     sections: [
       { id: "sec_sc_ga", name: "الدخول العام وقرية السباق", category_name: "Village Access", price: 90, available_seats: 1500, total_seats: 6000, color: "#3b82f6" },
@@ -1004,7 +1006,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_taita_play",
     chart_key: "seatcloud_mohammed_ali",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "مسرحية كوميدية غنائية استعراضية من بطولة النجم أكرم حسني وميرنا جميل وبيومي فؤاد تدور في إطار فانتازي ساخر.",
     sections: [
       { id: "sec_c", name: "الدرجة الثالثة C", category_name: "Standard Cat C", price: 90, available_seats: 120, total_seats: 400, color: "#64748b" },
@@ -1033,7 +1035,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_bakr_shaddi_helmy",
     chart_key: "seatcloud_bakr_shaddi",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "عمل مسرحي كوميدي مغامرات ضخم للنجم كريم عبدالعزيز ونيللي كريم ومصطفى خاطر في رحلة ساحرة عبر الزمن.",
     sections: [
       { id: "sec_c", name: "الدرجة الثالثة C", category_name: "Standard Cat C", price: 110, available_seats: 95, total_seats: 350, color: "#64748b" },
@@ -1062,7 +1064,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_onemic",
     chart_key: "seatcloud_onemic",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "أمسيات ضحك وكوميديا ارتجالية أسبوعية تجمع ألمع نجوم الستاند أب كوميدي في الرياض.",
     sections: [
       { id: "sec_om_gen", name: "دخول عام (مقاعد المسرح)", category_name: "General Admission", price: 60, available_seats: 110, total_seats: 220, color: "#3b82f6" },
@@ -1090,7 +1092,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_mina_nader",
     chart_key: "seatcloud_mina_nader",
     seats_provider: "seatcloud",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "العرض الكوميدي الخاص للفنان والكوميديان مينا نادر في ليلة مليئة بالمواقف الساخرة والضحك المتواصل.",
     sections: [
       { id: "sec_mn_gen", name: "تذكرة دخول عام", category_name: "General Tier", price: 70, available_seats: 90, total_seats: 200, color: "#3b82f6" },
@@ -1120,7 +1122,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_awwal_tour",
     chart_key: "seatcloud_awwal_tour",
     seats_provider: "general_admission",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "اكتشف كواليس معقل نادي النصر! جولة داخل غرف ملابس اللاعبين، النفق المؤدي لأرضية الملعب، ومتحف الكؤوس التذكاري.",
     sections: [
       { id: "sec_tour_std", name: "جولة الاستاد العامة", category_name: "Standard Stadium Tour", price: 45, available_seats: 400, total_seats: 1000, color: "#3b82f6" },
@@ -1148,7 +1150,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_comiccon_2026",
     chart_key: "seatcloud_comiccon",
     seats_provider: "general_admission",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "ملتقى عشاق الأنمي والألعاب والقصص المصورة مع حضور نجوم هوليوود ومسابقات الكوسبلاي الكبرى وجلسات التوقيع.",
     sections: [
       { id: "sec_cc_daily", name: "تذكرة يوم واحد", category_name: "1-Day Pass", price: 85, available_seats: 1100, total_seats: 6000, color: "#3b82f6" },
@@ -1177,7 +1179,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_fit_expo",
     chart_key: "seatcloud_fitexpo",
     seats_provider: "general_admission",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "أكبر معرض رياضي في المنطقة يستعرض أحدث أجهزة اللياقة والمكملات الغذائية مع ورش تدريب حية وتحديات كروس فيت بحضور أبطال مستر أولمبيا.",
     sections: [
       { id: "sec_fe_entry", name: "تذكرة دخول المعرض", category_name: "Standard Expo Pass", price: 40, available_seats: 1600, total_seats: 5000, color: "#3b82f6" },
@@ -1207,7 +1209,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_moc_chinese_art",
     chart_key: "seatcloud_chinese_art",
     seats_provider: "general_admission",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "معرض ثقافي استثنائي تنظمه وزارة الثقافة يضم لوحات ومنحوتات نادرة لفنانين صينيين مع ورش عمل لتعليم فن الخط والزودياك وحفل الشاي التقليدي.",
     sections: [
       { id: "sec_art_entry", name: "تذكرة دخول المعرض", category_name: "Exhibition Entry", price: 25, available_seats: 850, total_seats: 2500, color: "#3b82f6" },
@@ -1235,7 +1237,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_amplify_kafd",
     chart_key: "seatcloud_amplify",
     seats_provider: "general_admission",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "ملتقى دولي يجمع رواد صناعة المحتوى والإعلام الترفيهي ومنصات البودكاست مع جلسات حوارية وجلسات تشبيك مهني.",
     sections: [
       { id: "sec_amp_std", name: "تذكرة حضور الجلسات والمعرض", category_name: "Delegate Pass", price: 150, available_seats: 320, total_seats: 1000, color: "#3b82f6" },
@@ -1263,7 +1265,7 @@ export const initialEvents: LiveEvent[] = [
     chart_token: "ch_webook_kids_culture",
     chart_key: "seatcloud_kidsculture",
     seats_provider: "general_admission",
-    synced_at: new Date().toISOString(),
+    synced_at: STATIC_SEED_TIME,
     description: "فعاليات تفاعلية وورش مسرح ورسم وقراءة قصص تستهدف تنمية مواهب الأطفال في بيئة ثقافية محفزة وممتعة.",
     sections: [
       { id: "sec_kc_child", name: "تذكرة طفل (شاملة الورش)", category_name: "Child Pass", price: 20, available_seats: 450, total_seats: 1000, color: "#10b981" },
@@ -1287,16 +1289,16 @@ export const initialTasks: ReservationTask[] = [
     worker_id: "wrk_sa_riyadh_01",
     reservation_id: "res_9182301",
     hold_token: "wbk_hld_8a92bc71904df1e39a",
-    hold_expires_at: new Date(Date.now() + 1000 * 60 * 15).toISOString(),
+    hold_expires_at: "2026-09-20T12:30:00.000Z",
     retry_count: 0,
     sniper_mode: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
-    updated_at: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
+    created_at: "2026-09-20T11:50:00.000Z",
+    updated_at: "2026-09-20T11:52:00.000Z",
     logs: [
-      { timestamp: new Date(Date.now() - 1000 * 60 * 10).toISOString(), state: "QUEUED", message: "Task initialized for 6 Kings Slam Tennis (Sniper Mode Active)" },
-      { timestamp: new Date(Date.now() - 1000 * 60 * 9).toISOString(), state: "SEARCHING", message: "Probing seat availability for category: Courtside Gold" },
-      { timestamp: new Date(Date.now() - 1000 * 60 * 8).toISOString(), state: "HOLDING", message: "Acquired atomic lock on Courtside VIP Row 2 (Seats: C12, C13)" },
-      { timestamp: new Date(Date.now() - 1000 * 60 * 8).toISOString(), state: "SUCCESS", message: "Hold token wbk_hld_8a92bc71904df1e39a verified on Webook Cloud. Ready for checkout." },
+      { timestamp: "2026-09-20T11:50:00.000Z", state: "QUEUED", message: "Task initialized for 6 Kings Slam Tennis (Sniper Mode Active)" },
+      { timestamp: "2026-09-20T11:51:00.000Z", state: "SEARCHING", message: "Probing seat availability for category: Courtside Gold" },
+      { timestamp: "2026-09-20T11:52:00.000Z", state: "HOLDING", message: "Acquired atomic lock on Courtside VIP Row 2 (Seats: C12, C13)" },
+      { timestamp: "2026-09-20T11:52:00.000Z", state: "SUCCESS", message: "Hold token wbk_hld_8a92bc71904df1e39a verified on Webook Cloud. Ready for checkout." },
     ]
   },
   {
@@ -1313,12 +1315,12 @@ export const initialTasks: ReservationTask[] = [
     worker_id: "wrk_sa_riyadh_02",
     retry_count: 1,
     sniper_mode: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-    updated_at: new Date(Date.now() - 1000 * 60 * 1).toISOString(),
+    created_at: "2026-09-20T11:55:00.000Z",
+    updated_at: "2026-09-20T11:59:00.000Z",
     logs: [
-      { timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(), state: "QUEUED", message: "Targeting high concurrency event (Riyadh Derby - Kingdom Arena)" },
-      { timestamp: new Date(Date.now() - 1000 * 60 * 3).toISOString(), state: "SEARCHING", message: "Polling seat map delta via SeatCloud WebSocket proxy" },
-      { timestamp: new Date(Date.now() - 1000 * 60 * 1).toISOString(), state: "RUNNING", message: "Detected 4 contiguous seats in Section E1. Dispatching reservation payload..." }
+      { timestamp: "2026-09-20T11:55:00.000Z", state: "QUEUED", message: "Targeting high concurrency event (Riyadh Derby - Kingdom Arena)" },
+      { timestamp: "2026-09-20T11:57:00.000Z", state: "SEARCHING", message: "Polling seat map delta via SeatCloud WebSocket proxy" },
+      { timestamp: "2026-09-20T11:59:00.000Z", state: "RUNNING", message: "Detected 4 contiguous seats in Section E1. Dispatching reservation payload..." }
     ]
   },
   {
@@ -1335,15 +1337,15 @@ export const initialTasks: ReservationTask[] = [
     worker_id: "wrk_sa_central_01",
     reservation_id: "res_9182399",
     hold_token: "wbk_hld_9831fba8201de39811",
-    hold_expires_at: new Date(Date.now() + 1000 * 60 * 12).toISOString(),
+    hold_expires_at: "2026-09-20T12:25:00.000Z",
     retry_count: 0,
     sniper_mode: false,
-    created_at: new Date(Date.now() - 1000 * 60 * 6).toISOString(),
-    updated_at: new Date(Date.now() - 1000 * 60 * 2).toISOString(),
+    created_at: "2026-09-20T11:54:00.000Z",
+    updated_at: "2026-09-20T11:58:00.000Z",
     logs: [
-      { timestamp: new Date(Date.now() - 1000 * 60 * 6).toISOString(), state: "QUEUED", message: "Task received for Assala Concert" },
-      { timestamp: new Date(Date.now() - 1000 * 60 * 4).toISOString(), state: "SEARCHING", message: "Locating seats in Gold Stalls tier" },
-      { timestamp: new Date(Date.now() - 1000 * 60 * 2).toISOString(), state: "HOLDING", message: "Reserved seats Row 3 (Seats 14, 15). Hold token issued." }
+      { timestamp: "2026-09-20T11:54:00.000Z", state: "QUEUED", message: "Task received for Assala Concert" },
+      { timestamp: "2026-09-20T11:56:00.000Z", state: "SEARCHING", message: "Locating seats in Gold Stalls tier" },
+      { timestamp: "2026-09-20T11:58:00.000Z", state: "HOLDING", message: "Reserved seats Row 3 (Seats 14, 15). Hold token issued." }
     ]
   },
   {
@@ -1360,15 +1362,15 @@ export const initialTasks: ReservationTask[] = [
     worker_id: "wrk_sa_riyadh_01",
     reservation_id: "res_8492012",
     hold_token: "wbk_hld_771920dfa209b119",
-    hold_expires_at: new Date(Date.now() + 1000 * 60 * 14).toISOString(),
+    hold_expires_at: "2026-09-20T12:28:00.000Z",
     retry_count: 0,
     sniper_mode: true,
-    created_at: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
-    updated_at: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+    created_at: "2026-09-20T11:40:00.000Z",
+    updated_at: "2026-09-20T11:42:00.000Z",
     logs: [
-      { timestamp: new Date(Date.now() - 1000 * 60 * 20).toISOString(), state: "QUEUED", message: "MDLBEAST Soundstorm VIB Task queued" },
-      { timestamp: new Date(Date.now() - 1000 * 60 * 19).toISOString(), state: "SEARCHING", message: "Locking VIB pass" },
-      { timestamp: new Date(Date.now() - 1000 * 60 * 18).toISOString(), state: "SUCCESS", message: "VIB tokens locked successfully" }
+      { timestamp: "2026-09-20T11:40:00.000Z", state: "QUEUED", message: "MDLBEAST Soundstorm VIB Task queued" },
+      { timestamp: "2026-09-20T11:41:00.000Z", state: "SEARCHING", message: "Locking VIB pass" },
+      { timestamp: "2026-09-20T11:42:00.000Z", state: "SUCCESS", message: "VIB tokens locked successfully" }
     ]
   }
 ];
@@ -1389,7 +1391,7 @@ export const initialAccounts: WebookAccount[] = [
     max_seats: 5,
     notes: "حساب رئيسي لحجز مباريات دوري أبطال آسيا",
     created_at: "2026-09-01T10:00:00Z",
-    last_used: new Date().toISOString(),
+    last_used: STATIC_SEED_TIME,
   },
   {
     id: "acc-2",
@@ -1406,7 +1408,7 @@ export const initialAccounts: WebookAccount[] = [
     max_seats: 5,
     notes: "حساب فعاليات القدية وحفلات موسم الرياض",
     created_at: "2026-09-02T14:30:00Z",
-    last_used: new Date().toISOString(),
+    last_used: STATIC_SEED_TIME,
   },
   {
     id: "acc-3",
@@ -1423,7 +1425,7 @@ export const initialAccounts: WebookAccount[] = [
     max_seats: 4,
     notes: "حساب جاهز للقنص المباشر لمباريات النصر",
     created_at: "2026-09-05T09:15:00Z",
-    last_used: new Date().toISOString(),
+    last_used: STATIC_SEED_TIME,
   },
   {
     id: "acc-4",
@@ -1440,7 +1442,7 @@ export const initialAccounts: WebookAccount[] = [
     max_seats: 4,
     notes: "حساب حفلات اليوم الوطني والمسارح",
     created_at: "2026-09-10T12:00:00Z",
-    last_used: new Date().toISOString(),
+    last_used: STATIC_SEED_TIME,
   },
   {
     id: "acc-5",
@@ -1455,9 +1457,21 @@ export const initialAccounts: WebookAccount[] = [
     max_seats: 6,
     notes: "حساب خامل جاهز لربطه بأي فعالية جديدة فور طرحها",
     created_at: "2026-09-12T16:40:00Z",
-    last_used: new Date().toISOString(),
+    last_used: STATIC_SEED_TIME,
   },
 ];
+
+export const initialStats: IngestionStats = {
+  total_events: initialEvents.length,
+  ready_events: initialEvents.filter((e) => e.hydration_status === "READY").length,
+  discovered_events: initialEvents.filter((e) => e.hydration_status === "DISCOVERED").length,
+  failed_events: initialEvents.filter((e) => e.hydration_status === "FAILED").length,
+  categorized: initialEvents.filter((e) => !!e.genre_slug).length,
+  uncategorized: initialEvents.filter((e) => !e.genre_slug).length,
+  hydrated: initialEvents.filter((e) => e.hydration_status === "READY").length,
+  "403_failed": 0,
+  duplicate_skipped: 14,
+};
 
 // In-Memory Database Store for Dynamic Operations
 class DatabaseStore {
@@ -1497,7 +1511,7 @@ class DatabaseStore {
       max_seats: data.max_seats || 4,
       notes: data.notes || "",
       created_at: new Date().toISOString(),
-      last_used: new Date().toISOString(),
+      last_used: STATIC_SEED_TIME,
     };
     this.accounts.unshift(newAcc);
     return newAcc;
@@ -1622,7 +1636,7 @@ class DatabaseStore {
       if (target) {
         target.status = "HOLDING";
         target.hold_token = `wbk_hld_${Math.random().toString(36).substring(2, 14)}${Math.random().toString(36).substring(2, 6)}`;
-        target.hold_expires_at = new Date(Date.now() + 1000 * 60 * 15).toISOString();
+        target.hold_expires_at = "2026-09-20T12:30:00.000Z";
         target.reservation_id = `res_${Math.floor(1000000 + Math.random() * 9000000)}`;
         if (!target.logs) target.logs = [];
         target.logs.push({
@@ -1668,7 +1682,7 @@ class DatabaseStore {
     setTimeout(() => {
       task.status = "HOLDING";
       task.hold_token = `wbk_hld_${Math.random().toString(36).substring(2, 12)}`;
-      task.hold_expires_at = new Date(Date.now() + 1000 * 60 * 15).toISOString();
+      task.hold_expires_at = "2026-09-20T12:30:00.000Z";
       if (!task.logs) task.logs = [];
       task.logs.push({
         timestamp: new Date().toISOString(),

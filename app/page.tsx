@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { LiveEvent, Genre, ReservationTask, IngestionStats, SniperCartItem } from "@/lib/types";
-import { initialEvents, initialGenres, initialTasks, dbStore } from "@/lib/data";
+import { initialEvents, initialGenres, initialTasks, initialStats, STATIC_SEED_TIME, dbStore } from "@/lib/data";
 import { Header } from "@/components/Header";
 import { MetricsGrid } from "@/components/MetricsGrid";
 import { FunnelHealth } from "@/components/FunnelHealth";
@@ -30,7 +30,7 @@ export default function Home() {
   const [events, setEvents] = useState<LiveEvent[]>(initialEvents);
   const [genres, setGenres] = useState<Genre[]>(initialGenres);
   const [tasks, setTasks] = useState<ReservationTask[]>(initialTasks);
-  const [stats, setStats] = useState<IngestionStats>(dbStore.getStats());
+  const [stats, setStats] = useState<IngestionStats>(initialStats);
 
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedGenre, setSelectedGenre] = useState<string>("all");
@@ -89,7 +89,7 @@ export default function Home() {
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
-  const [lastSyncTime, setLastSyncTime] = useState<string>(new Date().toISOString());
+  const [lastSyncTime, setLastSyncTime] = useState<string>(STATIC_SEED_TIME);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {

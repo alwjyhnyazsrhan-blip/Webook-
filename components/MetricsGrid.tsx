@@ -24,7 +24,7 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({ stats }) => {
             <Database className="w-4 h-4" />
           </div>
         </div>
-        <div className="text-4xl font-extrabold text-white tracking-tight">
+        <div className="text-4xl font-extrabold text-white tracking-tight" suppressHydrationWarning>
           {stats.total_events}
         </div>
         <div className="text-xs text-slate-500 mt-2 font-mono flex items-center gap-1.5">
@@ -46,7 +46,7 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({ stats }) => {
             <CheckCircle className="w-4 h-4" />
           </div>
         </div>
-        <div className="text-4xl font-extrabold text-white tracking-tight">
+        <div className="text-4xl font-extrabold text-white tracking-tight" suppressHydrationWarning>
           {stats.ready_events}
         </div>
         <div className="text-xs text-emerald-400 mt-2 font-semibold flex items-center gap-1">
@@ -67,7 +67,7 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({ stats }) => {
             <Clock className="w-4 h-4" />
           </div>
         </div>
-        <div className="text-4xl font-extrabold text-white tracking-tight">
+        <div className="text-4xl font-extrabold text-white tracking-tight" suppressHydrationWarning>
           {stats.discovered_events}
         </div>
         <div className="text-xs text-yellow-500/90 mt-2 font-mono">
@@ -88,7 +88,7 @@ export const MetricsGrid: React.FC<MetricsGridProps> = ({ stats }) => {
             <AlertTriangle className="w-4 h-4" />
           </div>
         </div>
-        <div className="text-4xl font-extrabold text-white tracking-tight">
+        <div className="text-4xl font-extrabold text-white tracking-tight" suppressHydrationWarning>
           {stats.failed_events}
         </div>
         <div className="text-xs text-red-400/90 mt-2">

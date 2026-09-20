@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* فرض الثيم الداكن واللون الفخم المطابق لتصميم المنصة */
 html, body {

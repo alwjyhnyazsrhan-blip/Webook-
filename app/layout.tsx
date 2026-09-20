@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Webook Ingestion Platform | Console",
+  title: "Webook Ingestion Platform",
   description:
-    "High-fidelity Webook inventory harvesting, taxonomy derivation, and reservation orchestration.",
+    "منصة وبوت قنص ومزامنة فعاليات وتذاكر Webook.com اللحظية مع تجاوز طوابير الانتظار وحجز المقاعد المؤكد",
 };
 
 export default function RootLayout({

@@ -17,7 +17,7 @@ export const FunnelHealth: React.FC<FunnelHealthProps> = ({ stats }) => {
         <div className="text-[11px] text-slate-400 font-bold uppercase mb-1">
           Categorized
         </div>
-        <div className="text-2xl font-bold text-white tracking-tight">
+        <div className="text-2xl font-bold text-white tracking-tight" suppressHydrationWarning>
           {stats.categorized}
         </div>
         <div className="text-[10px] text-slate-500 mt-1">Genre assigned</div>
@@ -30,7 +30,7 @@ export const FunnelHealth: React.FC<FunnelHealthProps> = ({ stats }) => {
         <div className="text-[11px] text-slate-400 font-bold uppercase mb-1">
           Uncategorized
         </div>
-        <div className="text-2xl font-bold text-white tracking-tight">
+        <div className="text-2xl font-bold text-white tracking-tight" suppressHydrationWarning>
           {stats.uncategorized}
         </div>
         <div className="text-[10px] text-slate-500 mt-1">Needs derivation</div>
@@ -43,7 +43,7 @@ export const FunnelHealth: React.FC<FunnelHealthProps> = ({ stats }) => {
         <div className="text-[11px] text-slate-400 font-bold uppercase mb-1">
           Hydrated
         </div>
-        <div className="text-2xl font-bold text-white tracking-tight">
+        <div className="text-2xl font-bold text-white tracking-tight" suppressHydrationWarning>
           {stats.hydrated}
         </div>
         <div className="text-[10px] text-slate-500 mt-1">Seats schema cached</div>
@@ -56,7 +56,7 @@ export const FunnelHealth: React.FC<FunnelHealthProps> = ({ stats }) => {
         <div className="text-[11px] text-slate-400 font-bold uppercase mb-1">
           403 Blocked
         </div>
-        <div className="text-2xl font-bold text-white tracking-tight">
+        <div className="text-2xl font-bold text-white tracking-tight" suppressHydrationWarning>
           {stats["403_failed"]}
         </div>
         <div className="text-[10px] text-slate-500 mt-1">Turnstile challenged</div>
@@ -69,7 +69,7 @@ export const FunnelHealth: React.FC<FunnelHealthProps> = ({ stats }) => {
         <div className="text-[11px] text-slate-400 font-bold uppercase mb-1">
           Skipped Dupes
         </div>
-        <div className="text-2xl font-bold text-white tracking-tight">
+        <div className="text-2xl font-bold text-white tracking-tight" suppressHydrationWarning>
           {stats.duplicate_skipped}
         </div>
         <div className="text-[10px] text-slate-500 mt-1">Idempotency match</div>
