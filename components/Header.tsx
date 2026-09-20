@@ -62,6 +62,16 @@ export const Header: React.FC<HeaderProps> = ({
                   v7.2
                 </span>
                 <a
+                  href="http://localhost:8501"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 px-2.5 py-0.5 rounded-full flex items-center gap-1 hover:bg-purple-500/25 transition-colors"
+                  title="فتح واجهة Streamlit الرسومية المستقلة على Port 8501"
+                >
+                  <span>🎯 Streamlit GUI (8501)</span>
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </a>
+                <a
                   href="https://webook.com"
                   target="_blank"
                   rel="noopener noreferrer"
