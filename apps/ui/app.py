@@ -62,16 +62,30 @@ st.sidebar.image("https://img.icons8.com/color/96/bullseye.png", width=64)
 st.sidebar.title("🎯 Webook Platform")
 st.sidebar.caption("لوحة التحكم الرسومية الموحدة (Streamlit GUI)")
 
-api_host = os.getenv("API_HOST", "localhost")
+try:
+    from core.network.tunnel import tunnel_manager, get_lan_ip
+    cached_api_tunnel = tunnel_manager.get_tunnel_url("api")
+    cached_st_tunnel = tunnel_manager.get_tunnel_url("streamlit")
+    lan_ip = get_lan_ip()
+except Exception:
+    cached_api_tunnel = None
+    cached_st_tunnel = None
+    lan_ip = "127.0.0.1"
+
+api_host = os.getenv("API_HOST", "127.0.0.1")
 api_port = os.getenv("API_PORT", "8000")
-api_base_url = st.sidebar.text_input("رابط خادم الـ API (Backend)", value=f"http://{api_host}:{api_port}/api")
+default_api_url = f"{cached_api_tunnel}/api" if cached_api_tunnel else f"http://{api_host}:{api_port}/api"
+api_base_url = st.sidebar.text_input("رابط خادم الـ API (Backend)", value=default_api_url)
 
 st.sidebar.divider()
-st.sidebar.subheader("📌 حالة المنافذ والتوجيه")
+st.sidebar.subheader("📌 حالة المنافذ والنفق الخارجي")
+tunnel_status_text = f"🟢 نشط: `{cached_st_tunnel}`" if cached_st_tunnel else "⚪ تشغيل محلي (Local / WiFi)"
 st.sidebar.info(f"""
-- **واجهة Streamlit الرئيسية:** Port `8501`
-- **خادم الـ API المنفصل:** Port `{api_port}` (`/api`)
-- **نفق العرض الخارجي:** موجه إلى Port `8501`
+- **واجهة Streamlit:** Port `8501`
+- **خادم الـ API:** Port `{api_port}` (`/api`)
+- **عنوان الشبكة (LAN/WiFi):** `{lan_ip}:8501`
+- **نفق Localtunnel للواجهة:**
+  {tunnel_status_text}
 """)
 
 # Main Header

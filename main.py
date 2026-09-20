@@ -30,7 +30,7 @@ print(f"[PATH_CONFIG] sys.path[0]: {sys.path[0]}")
 print("MAIN_LOADED")
 
 # ==============================================================================
-# Core Application Imports & Fallbacks
+# Core Application Imports & Network Management
 # ==============================================================================
 try:
     from apps.api.main import app as api_app
@@ -53,12 +53,22 @@ from core.database.postgres import engine, AsyncSessionLocal
 from services.discovery.engine import DiscoveryEngine
 from services.reservation.swapper import HoldSwapper
 from services.monitor.ghost import GhostMonitor
+from core.network.tunnel import (
+    tunnel_manager,
+    resolve_non_conflicting_ports,
+    check_port_available,
+    get_lan_ip,
+)
 
-# Port Configuration
-API_PORT = int(os.getenv("API_PORT", str(getattr(settings, "api_port", 8000))))
+# Safe Non-Conflicting Port Configuration
+_RAW_API_PORT = int(os.getenv("API_PORT", str(getattr(settings, "api_port", 8000))))
+_RAW_STREAMLIT_PORT = int(os.getenv("STREAMLIT_PORT", "8501"))
+API_PORT, STREAMLIT_PORT = resolve_non_conflicting_ports(_RAW_API_PORT, _RAW_STREAMLIT_PORT)
 API_HOST = os.getenv("API_HOST", getattr(settings, "api_host", "0.0.0.0"))
-STREAMLIT_PORT = int(os.getenv("STREAMLIT_PORT", "8501"))
 STREAMLIT_HOST = os.getenv("STREAMLIT_HOST", "0.0.0.0")
+
+os.environ["API_PORT"] = str(API_PORT)
+os.environ["STREAMLIT_PORT"] = str(STREAMLIT_PORT)
 
 discovery_engine = DiscoveryEngine()
 
@@ -96,41 +106,53 @@ async def ghost_monitor_loop():
         await asyncio.sleep(GHOST_SCAN_INTERVAL)
 
 # ==============================================================================
-# Service Launchers (Decoupled API & Streamlit)
+# Service Launchers & External Tunnel Orchestrator
 # ==============================================================================
-def start_tunnel_if_requested(target_port: int = 8501):
+def setup_external_tunnels(open_tunnel: bool = False, dual_tunnels: bool = False):
     """
-    Starts a Cloudflared or Localtunnel tunnel targeting the Streamlit UI (Port 8501)
-    so the public URL opens the graphical interface directly instead of raw JSON.
+    Sets up external public tunnels (Localtunnel / Cloudflared / Ngrok)
+    targeting Streamlit UI (Port 8501) and optionally FastAPI Backend (Port 8000).
+    Guarantees that public links point to actual external domains, NOT localhost.
     """
-    try:
-        print(f"\n[TUNNEL] Setting up public tunnel to Streamlit UI on Port {target_port}...")
-        # Check if running in Google Colab
-        in_colab = "google.colab" in sys.modules
-        
-        # Check for pyngrok or cloudflared
-        try:
-            from pyngrok import ngrok
-            tunnel = ngrok.connect(target_port)
-            print(f"======================================================================")
-            print(f"🚀 PUBLIC TUNNEL ACTIVE (Streamlit GUI): {tunnel.public_url}")
-            print(f"======================================================================")
-            return tunnel.public_url
-        except Exception:
-            pass
-            
-        print(f"[TUNNEL] To expose Streamlit UI via cloudflared: npx localtunnel --port {target_port}")
-    except Exception as e:
-        print(f"[TUNNEL INFO] Tunnel setup skipped or manual: {e}")
-    return None
+    in_colab = "google.colab" in sys.modules
+    should_run = open_tunnel or in_colab or dual_tunnels
+
+    if not should_run:
+        return
+
+    print("\n" + "=" * 70)
+    print("🌐 INITIATING EXTERNAL TUNNEL ORCHESTRATION (LOCALTUNNEL)")
+    print("=" * 70)
+
+    # 1. Primary: Start Streamlit GUI tunnel on Port 8501
+    st_url = tunnel_manager.start_localtunnel(STREAMLIT_PORT, "streamlit")
+
+    # 2. Secondary: If dual requested or Colab, start API tunnel on Port 8000
+    if dual_tunnels or in_colab:
+        api_url = tunnel_manager.start_localtunnel(API_PORT, "api")
+    else:
+        api_url = tunnel_manager.get_tunnel_url("api")
+
+    print("=" * 70)
+    if st_url:
+        print(f"🚀 STREAMLIT FRONTEND TUNNEL: {st_url}")
+    else:
+        print(f"⏳ STREAMLIT TUNNEL: In background / run 'npx localtunnel --port {STREAMLIT_PORT}'")
+
+    if api_url:
+        print(f"⚙️  FASTAPI BACKEND TUNNEL:   {api_url}/api")
+    print("=" * 70 + "\n")
 
 def run_streamlit_process(port: int = STREAMLIT_PORT):
-    """Launches the Streamlit GUI in a dedicated process on Port 8501"""
+    """
+    Launches the Streamlit GUI in a dedicated process with CORS and XSRF disabled
+    to allow seamless mobile access through localtunnel and external proxies.
+    """
     ui_app_path = os.path.join(PROJECT_ROOT, "apps", "ui", "app.py")
     if not os.path.exists(ui_app_path):
         # Fallback to main.py
         ui_app_path = os.path.join(PROJECT_ROOT, "main.py")
-        
+
     cmd = [
         sys.executable,
         "-m",
@@ -140,9 +162,11 @@ def run_streamlit_process(port: int = STREAMLIT_PORT):
         f"--server.port={port}",
         f"--server.address={STREAMLIT_HOST}",
         "--server.headless=true",
+        "--server.enableCORS=false",
+        "--server.enableXsrfProtection=false",
         "--browser.gatherUsageStats=false"
     ]
-    print(f"[STREAMLIT_PROCESS] Launching Streamlit GUI on port {port}...")
+    print(f"[STREAMLIT_PROCESS] Launching Streamlit GUI on port {port} (CORS & XSRF disabled for tunnel compatibility)...")
     try:
         proc = subprocess.Popen(cmd, env=os.environ.copy())
         return proc
@@ -170,22 +194,27 @@ async def run_api_server():
     except Exception as e:
         print(f"[API_ERROR] Backend server failure: {e}")
 
-async def run_unified_ecosystem(open_tunnel: bool = False):
+async def run_unified_ecosystem(open_tunnel: bool = False, dual_tunnels: bool = False):
     """
     Main Orchestrator:
-    1. Initializes Database
-    2. Spawns Streamlit GUI on Port 8501 (Main UI Route)
-    3. Starts Backend API on Port 8000 under /api
-    4. Starts Bot and autonomous Sniper loops
+    1. Safe port allocation check (no conflicts between API and Streamlit).
+    2. Initializes Database.
+    3. Spawns Streamlit GUI on Port 8501 (Main UI Route).
+    4. Orchestrates external public tunnels (Localtunnel).
+    5. Starts Backend API on Port 8000 under /api with smart mobile routing.
+    6. Starts Bot and autonomous Sniper loops.
     """
-    print("\n" + "=" * 70)
+    lan_ip = get_lan_ip()
+
+    print("\n" + "=" * 75)
     print("🎯 WEBOOK INGESTION & SNIPER PLATFORM - DECOUPLED ARCHITECTURE")
-    print("=" * 70)
+    print("=" * 75)
     print(f"🖥️  Streamlit UI (Main Frontend):  http://localhost:{STREAMLIT_PORT}")
+    print(f"📱  Streamlit UI (Local WiFi/LAN): http://{lan_ip}:{STREAMLIT_PORT}")
     print(f"⚙️  Backend API (Dedicated Path):  http://localhost:{API_PORT}/api")
     print(f"📚  API Documentation (Swagger):   http://localhost:{API_PORT}/docs")
-    print(f"🔄  Auto-Redirect:                 http://localhost:{API_PORT}/ -> Streamlit ({STREAMLIT_PORT})")
-    print("=" * 70 + "\n")
+    print(f"🔄  Dynamic Gateway:              http://localhost:{API_PORT}/ -> Smart Tunnel Resolver")
+    print("=" * 75 + "\n")
 
     # 1. Initialize Database Tables
     try:
@@ -198,14 +227,13 @@ async def run_unified_ecosystem(open_tunnel: bool = False):
     # 2. Launch Streamlit UI process (Port 8501)
     streamlit_proc = run_streamlit_process(port=STREAMLIT_PORT)
 
-    # 3. Setup Tunnel to Streamlit UI if requested or in Colab
-    if open_tunnel or "google.colab" in sys.modules:
-        start_tunnel_if_requested(target_port=STREAMLIT_PORT)
+    # 3. Setup External Public Tunnels if requested or in Colab
+    setup_external_tunnels(open_tunnel=open_tunnel, dual_tunnels=dual_tunnels)
 
     # 4. Run API Server + Background Tasks concurrently
     bot_task = asyncio.create_task(start_bot())
     sync_task = asyncio.create_task(background_sync_loop())
-    
+
     try:
         await asyncio.gather(
             run_api_server(),
@@ -217,6 +245,7 @@ async def run_unified_ecosystem(open_tunnel: bool = False):
         if streamlit_proc and streamlit_proc.poll() is None:
             print("[SHUTDOWN] Terminating Streamlit UI process...")
             streamlit_proc.terminate()
+        tunnel_manager.stop_all()
 
 # ==============================================================================
 # Streamlit Execution Support (If run via: streamlit run main.py)
@@ -247,6 +276,17 @@ if __name__ == "__main__":
             help="Expose Streamlit UI directly via public tunnel (Port 8501)"
         )
         parser.add_argument(
+            "--dual-tunnels",
+            action="store_true",
+            help="Expose BOTH Streamlit UI (Port 8501) and API (Port 8000) via separate public tunnels"
+        )
+        parser.add_argument(
+            "--streamlit-url",
+            type=str,
+            default=None,
+            help="Pre-configured external Streamlit URL (e.g. https://xxx.loca.lt)"
+        )
+        parser.add_argument(
             "--api-port",
             type=int,
             default=API_PORT,
@@ -265,6 +305,14 @@ if __name__ == "__main__":
         if args.ui_port:
             STREAMLIT_PORT = args.ui_port
 
+        # Re-verify port safety with user CLI overrides
+        API_PORT, STREAMLIT_PORT = resolve_non_conflicting_ports(API_PORT, STREAMLIT_PORT)
+        os.environ["API_PORT"] = str(API_PORT)
+        os.environ["STREAMLIT_PORT"] = str(STREAMLIT_PORT)
+
+        if args.streamlit_url:
+            tunnel_manager.set_tunnel_url("streamlit", args.streamlit_url)
+
         try:
             if args.mode == "ui":
                 print(f"[MODE] Starting Streamlit GUI solely on port {STREAMLIT_PORT}...")
@@ -276,7 +324,10 @@ if __name__ == "__main__":
                 asyncio.run(run_api_server())
             else:
                 # Mode 'all' (Default)
-                asyncio.run(run_unified_ecosystem(open_tunnel=args.tunnel))
+                asyncio.run(run_unified_ecosystem(
+                    open_tunnel=args.tunnel,
+                    dual_tunnels=args.dual_tunnels
+                ))
         except KeyboardInterrupt:
             print("\n[SYSTEM] Graceful shutdown completed.")
         except Exception as e:
