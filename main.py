@@ -1,5 +1,6 @@
 # ==============================================================================
-# Google Colab & Absolute Import Compatibility Setup (MUST RUN FIRST)
+# Webook Ingestion & Sniper Control Platform - Main Entrypoint
+# Standardized Clean Absolute Imports & Robust Multi-Environment Compatibility
 # ==============================================================================
 import os
 import sys
@@ -10,49 +11,59 @@ import threading
 import time
 from pathlib import Path
 
-# Dynamically resolve absolute project root directory
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
-PARENT_DIR = os.path.dirname(PROJECT_ROOT)
-CWD = os.getcwd()
+# ------------------------------------------------------------------------------
+# 1. Deterministic Project Root & Python Path Configuration
+# ------------------------------------------------------------------------------
+# Resolve the true project root (the directory containing this main.py)
+PROJECT_ROOT = Path(__file__).resolve().parent
 
-# Inject project root and common subdirectories into sys.path
-for path_entry in [PROJECT_ROOT, PARENT_DIR, CWD]:
-    if path_entry and path_entry not in sys.path:
-        sys.path.insert(0, path_entry)
+# Ensure the project root is explicitly at the head of sys.path
+root_str = str(PROJECT_ROOT)
+if root_str in sys.path:
+    sys.path.remove(root_str)
+sys.path.insert(0, root_str)
 
-# Ensure PYTHONPATH environment variable is set for sub-processes and workers
+# Ensure PYTHONPATH environment variable reflects the project root for child processes
 current_pythonpath = os.environ.get("PYTHONPATH", "")
-if PROJECT_ROOT not in current_pythonpath.split(os.pathsep):
-    os.environ["PYTHONPATH"] = f"{PROJECT_ROOT}{os.pathsep}{current_pythonpath}" if current_pythonpath else PROJECT_ROOT
+if root_str not in current_pythonpath.split(os.pathsep):
+    os.environ["PYTHONPATH"] = f"{root_str}{os.pathsep}{current_pythonpath}" if current_pythonpath else root_str
 
-print(f"[PATH_CONFIG] Absolute project root configured: {PROJECT_ROOT}")
-print(f"[PATH_CONFIG] sys.path[0]: {sys.path[0]}")
-print("MAIN_LOADED")
-
-# ==============================================================================
-# Core Application Imports & Network Management
-# ==============================================================================
+# Install or verify .pth file in python user/system site-packages if writable (failsafe)
 try:
-    from apps.api.main import app as api_app
-except ModuleNotFoundError as e:
-    print(f"[WARN] apps.api.main import fallback: {e}")
-    from fastapi import FastAPI
-    api_app = FastAPI()
+    import site
+    site_dirs = site.getsitepackages() if hasattr(site, "getsitepackages") else []
+    user_site = site.getusersitepackages() if hasattr(site, "getusersitepackages") else None
+    if user_site:
+        site_dirs.append(user_site)
+    for sdir in site_dirs:
+        try:
+            pth_path = Path(sdir) / "webook.pth"
+            if not pth_path.exists():
+                pth_path.parent.mkdir(parents=True, exist_ok=True)
+                pth_path.write_text(f"{root_str}\n", encoding="utf-8")
+                break
+        except Exception:
+            continue
+except Exception:
+    pass
 
-try:
-    from apps.bot.main import start_bot
-except ModuleNotFoundError as e:
-    print(f"[WARN] apps.bot.main import fallback: {e}")
-    async def start_bot():
-        print("[BOT] Mock bot started")
-
+# ------------------------------------------------------------------------------
+# 2. Clean Absolute Imports for All Modules
+# ------------------------------------------------------------------------------
+# Core Platform Configuration & Logging
 from core.config.settings import settings
 from core.logging.logger import logger
+
+# Core Database & Models
 from database.models import Base
 from core.database.postgres import engine, AsyncSessionLocal
+
+# Core Services
 from services.discovery.engine import DiscoveryEngine
 from services.reservation.swapper import HoldSwapper
 from services.monitor.ghost import GhostMonitor
+
+# Core Network & Dynamic Tunnel Management
 from core.network.tunnel import (
     tunnel_manager,
     resolve_non_conflicting_ports,
@@ -60,7 +71,25 @@ from core.network.tunnel import (
     get_lan_ip,
 )
 
-# Safe Non-Conflicting Port Configuration
+# API Application (FastAPI Decoupled Backend)
+try:
+    from apps.api.main import app as api_app
+except Exception as e:
+    logger.warning(f"[API_IMPORT_FALLBACK] {e}")
+    from fastapi import FastAPI
+    api_app = FastAPI(title="Webook Platform API Fallback")
+
+# Bot Application
+try:
+    from apps.bot.main import start_bot
+except Exception as e:
+    logger.warning(f"[BOT_IMPORT_FALLBACK] {e}")
+    async def start_bot():
+        logger.info("[BOT] Bot stub active.")
+
+# ------------------------------------------------------------------------------
+# 3. Port & Host Safety Configuration
+# ------------------------------------------------------------------------------
 _RAW_API_PORT = int(os.getenv("API_PORT", str(getattr(settings, "api_port", 8000))))
 _RAW_STREAMLIT_PORT = int(os.getenv("STREAMLIT_PORT", "8501"))
 API_PORT, STREAMLIT_PORT = resolve_non_conflicting_ports(_RAW_API_PORT, _RAW_STREAMLIT_PORT)
@@ -72,9 +101,9 @@ os.environ["STREAMLIT_PORT"] = str(STREAMLIT_PORT)
 
 discovery_engine = DiscoveryEngine()
 
-# ==============================================================================
-# Background Service Loops
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# 4. Background Service Loops
+# ------------------------------------------------------------------------------
 async def background_sync_loop():
     """PHASE 5: LIVE AVAILABILITY ENGINE"""
     while True:
@@ -105,14 +134,14 @@ async def ghost_monitor_loop():
             logger.warning(f"[GHOST_MONITOR] iteration error: {e}")
         await asyncio.sleep(GHOST_SCAN_INTERVAL)
 
-# ==============================================================================
-# Service Launchers & External Tunnel Orchestrator
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# 5. Service Launchers & External Tunnel Orchestrator
+# ------------------------------------------------------------------------------
 def setup_external_tunnels(open_tunnel: bool = False, dual_tunnels: bool = False):
     """
-    Sets up external public tunnels (Localtunnel / Cloudflared / Ngrok)
-    targeting Streamlit UI (Port 8501) and optionally FastAPI Backend (Port 8000).
-    Guarantees that public links point to actual external domains, NOT localhost.
+    Sets up external public tunnels (Localtunnel) targeting Streamlit UI (Port 8501)
+    and optionally FastAPI Backend (Port 8000). Guarantees that public links point
+    to actual external domains, NOT localhost.
     """
     in_colab = "google.colab" in sys.modules
     should_run = open_tunnel or in_colab or dual_tunnels
@@ -148,17 +177,16 @@ def run_streamlit_process(port: int = STREAMLIT_PORT):
     Launches the Streamlit GUI in a dedicated process with CORS and XSRF disabled
     to allow seamless mobile access through localtunnel and external proxies.
     """
-    ui_app_path = os.path.join(PROJECT_ROOT, "apps", "ui", "app.py")
-    if not os.path.exists(ui_app_path):
-        # Fallback to main.py
-        ui_app_path = os.path.join(PROJECT_ROOT, "main.py")
+    ui_app_path = PROJECT_ROOT / "apps" / "ui" / "app.py"
+    if not ui_app_path.exists():
+        ui_app_path = PROJECT_ROOT / "main.py"
 
     cmd = [
         sys.executable,
         "-m",
         "streamlit",
         "run",
-        ui_app_path,
+        str(ui_app_path),
         f"--server.port={port}",
         f"--server.address={STREAMLIT_HOST}",
         "--server.headless=true",
@@ -168,7 +196,10 @@ def run_streamlit_process(port: int = STREAMLIT_PORT):
     ]
     print(f"[STREAMLIT_PROCESS] Launching Streamlit GUI on port {port} (CORS & XSRF disabled for tunnel compatibility)...")
     try:
-        proc = subprocess.Popen(cmd, env=os.environ.copy())
+        # Child process inherits PYTHONPATH pointing to PROJECT_ROOT
+        env = os.environ.copy()
+        env["PYTHONPATH"] = f"{root_str}{os.pathsep}{env.get('PYTHONPATH', '')}".rstrip(os.pathsep)
+        proc = subprocess.Popen(cmd, env=env)
         return proc
     except Exception as e:
         print(f"[STREAMLIT_ERROR] Failed to spawn streamlit process: {e}")
@@ -247,9 +278,9 @@ async def run_unified_ecosystem(open_tunnel: bool = False, dual_tunnels: bool = 
             streamlit_proc.terminate()
         tunnel_manager.stop_all()
 
-# ==============================================================================
-# Streamlit Execution Support (If run via: streamlit run main.py)
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# 6. Streamlit Execution Support (If run via: streamlit run main.py)
+# ------------------------------------------------------------------------------
 if "streamlit" in sys.modules or any("streamlit" in arg for arg in sys.argv):
     try:
         from apps.ui.app import *
@@ -258,9 +289,9 @@ if "streamlit" in sys.modules or any("streamlit" in arg for arg in sys.argv):
         st.title("🎯 Webook Ingestion & Sniper Platform")
         st.info("Streamlit GUI active. Loading control center...")
 
-# ==============================================================================
-# CLI Entrypoint
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# 7. CLI Entrypoint
+# ------------------------------------------------------------------------------
 if __name__ == "__main__":
     if not any("streamlit" in arg for arg in sys.argv):
         parser = argparse.ArgumentParser(description="Webook Ingestion & Sniper Control Platform")
