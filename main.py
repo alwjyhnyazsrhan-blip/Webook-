@@ -261,15 +261,21 @@ async def run_unified_ecosystem(open_tunnel: bool = False, dual_tunnels: bool = 
     # 3. Setup External Public Tunnels if requested or in Colab
     setup_external_tunnels(open_tunnel=open_tunnel, dual_tunnels=dual_tunnels)
 
-    # 4. Run API Server + Background Tasks concurrently
+    # 4. Run API Server + All Background Tasks concurrently (Bot, Sync, Ghost Monitor, Hold Swapper)
     bot_task = asyncio.create_task(start_bot())
     sync_task = asyncio.create_task(background_sync_loop())
+    ghost_task = asyncio.create_task(ghost_monitor_loop())
+    swapper_task = asyncio.create_task(hold_swapper_loop())
+
+    print("[ORCHESTRATOR] Concurrently launching API server, Telegram bot, and all background discovery engines...")
 
     try:
         await asyncio.gather(
             run_api_server(),
             bot_task,
             sync_task,
+            ghost_task,
+            swapper_task,
             return_exceptions=True
         )
     finally:
