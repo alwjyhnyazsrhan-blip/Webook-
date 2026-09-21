@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Webook Ingestion Platform",
   description:
-    "منصة وبوت قنص ومزامنة فعاليات وتذاكر Webook.com اللحظية مع تجاوز طوابير الانتظار وحجز المقاعد المؤكد",
+    "منصة ويب متكاملة لقنص ومزامنة فعاليات وتذاكر Webook.com اللحظية مع تجاوز طوابير الانتظار وحجز المقاعد المؤكد",
 };
 
 export default function RootLayout({
