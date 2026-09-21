@@ -70,6 +70,37 @@ def resolve_non_conflicting_ports(api_port: int = 8000, streamlit_port: int = 85
     return final_api, final_st
 
 
+def verify_tunnel_url(url: str, timeout: float = 2.0) -> bool:
+    """
+    Actively tests an external tunnel URL to verify it is responsive
+    and NOT returning 503 Tunnel Unavailable or connection failure.
+    """
+    if not url or not isinstance(url, str):
+        return False
+    cleaned = url.strip()
+    if "localhost" in cleaned or "127.0.0.1" in cleaned or not cleaned.startswith("http"):
+        return False
+    try:
+        import urllib.request
+        import urllib.error
+        req = urllib.request.Request(
+            cleaned,
+            headers={"User-Agent": "Mozilla/5.0 (compatible; WebookTunnelChecker/1.0)"}
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            code = resp.getcode()
+            # Status < 500 means server responded (200, 302, 401, etc.)
+            return code < 500
+    except urllib.error.HTTPError as e:
+        # Localtunnel returns 503 when tunnel process is down or disconnected
+        if e.code in (502, 503, 504):
+            return False
+        # Auth pages, 404, or 403 are still live tunnel endpoints
+        return True
+    except Exception:
+        return False
+
+
 class TunnelManager:
     """
     Manages external tunnels (localtunnel / cloudflared / ngrok)
@@ -88,7 +119,7 @@ class TunnelManager:
         atexit.register(self.stop_all)
 
     def _load_cached_tunnels(self):
-        """Loads cached tunnel URLs from disk if available."""
+        """Loads cached tunnel URLs from disk if available and removes stale/dead entries."""
         for path in [CONFIG_FILE, TMP_CONFIG_FILE]:
             try:
                 if path.exists():
@@ -97,6 +128,9 @@ class TunnelManager:
                         if isinstance(data, dict):
                             for k, v in data.items():
                                 if v and isinstance(v, str) and not self._urls.get(k):
+                                    # Never load obviously fake or stale webook-ui.loca.lt
+                                    if "webook-ui.loca.lt" in v:
+                                        continue
                                     self._urls[k] = v
             except Exception:
                 pass
@@ -115,8 +149,21 @@ class TunnelManager:
         except Exception as e:
             print(f"[TUNNEL_CACHE_WARN] Could not persist tunnel info: {e}")
 
-    def get_tunnel_url(self, service: str) -> Optional[str]:
-        """Returns the public tunnel URL for a service ('streamlit' or 'api')."""
+    def reset_tunnels(self):
+        """Clears all cached and in-memory tunnel URLs to prevent stale 503 redirects."""
+        with self._lock:
+            self._urls = {"api": "", "streamlit": ""}
+            os.environ.pop("STREAMLIT_URL", None)
+            os.environ.pop("STREAMLIT_TUNNEL_URL", None)
+            os.environ.pop("API_TUNNEL_URL", None)
+            self._save_cached_tunnels()
+            print("[TUNNEL_RESET] All cached tunnels have been cleared.")
+
+    def get_tunnel_url(self, service: str, verify: bool = False) -> Optional[str]:
+        """
+        Returns the public tunnel URL for a service ('streamlit' or 'api').
+        If verify=True, tests the URL and unsets it if it returns 503/error.
+        """
         with self._lock:
             url = self._urls.get(service)
             if not url:
@@ -131,7 +178,20 @@ class TunnelManager:
                 # Reject localhost as a valid 'tunnel' URL
                 if "localhost" in url or "127.0.0.1" in url:
                     return None
-            return url
+                # Reject hardcoded stale URLs
+                if "webook-ui.loca.lt" in url:
+                    self._urls[service] = ""
+                    self._save_cached_tunnels()
+                    return None
+
+            if url and verify:
+                if not verify_tunnel_url(url):
+                    print(f"[TUNNEL_HEALTH] Cached URL for {service} ({url}) returned 503 or is dead. Unsetting.")
+                    self._urls[service] = ""
+                    self._save_cached_tunnels()
+                    return None
+
+            return url or None
 
     def set_tunnel_url(self, service: str, url: str):
         """Manually registers or updates a tunnel URL."""
@@ -280,8 +340,8 @@ def resolve_client_streamlit_url(
     is_lan = bool(re.match(r"^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)", host_clean))
     is_external = not (is_localhost or is_lan)
 
-    # 2. Check if a valid external Streamlit tunnel exists
-    external_st_url = tunnel_manager.get_tunnel_url("streamlit")
+    # 2. Check if a valid external Streamlit tunnel exists (with active verification)
+    external_st_url = tunnel_manager.get_tunnel_url("streamlit", verify=True)
     if external_st_url and ("localhost" in external_st_url or "127.0.0.1" in external_st_url):
         external_st_url = None
 
@@ -292,7 +352,8 @@ def resolve_client_streamlit_url(
                 "url": external_st_url,
                 "target_type": "external_tunnel",
                 "is_external": True,
-                "can_auto_redirect": True,
+                "can_auto_redirect": False,  # Keep False on mobile to prevent 503 redirect loops!
+                "is_verified": True,
                 "display_host": host_clean,
             }
         else:
@@ -303,6 +364,7 @@ def resolve_client_streamlit_url(
                 "target_type": "pending_tunnel",
                 "is_external": True,
                 "can_auto_redirect": False,
+                "is_verified": False,
                 "display_host": host_clean,
             }
 

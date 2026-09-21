@@ -188,24 +188,52 @@ try:
             "streamlit_url": url,
         }
 
+    @api_router.post("/tunnel/reset")
+    async def reset_tunnel_info():
+        """Clears all cached and stale tunnel URLs to immediately recover from 503 errors."""
+        tunnel_manager.reset_tunnels()
+        return {
+            "status": "ok",
+            "message": "All cached tunnel URLs have been cleared to recover from 503."
+        }
+
+    @api_router.get("/tunnel/verify")
+    async def verify_tunnel_endpoint(url: Optional[str] = None):
+        """Actively checks if a tunnel URL is reachable and alive."""
+        from core.network.tunnel import verify_tunnel_url
+        target = url or tunnel_manager.get_tunnel_url("streamlit")
+        if not target:
+            return {"alive": False, "url": None, "reason": "No tunnel URL registered"}
+        is_alive = verify_tunnel_url(target)
+        if not is_alive and not url:
+            # Unset dead tunnel from memory & disk
+            tunnel_manager.set_tunnel_url("streamlit", "")
+        return {
+            "alive": is_alive,
+            "url": target,
+            "reason": "OK" if is_alive else "Tunnel returned 503 or is unreachable"
+        }
+
     @api_router.post("/tunnel/start-streamlit")
     async def trigger_streamlit_tunnel(background_tasks: BackgroundTasks):
-        """Spawns an automatic background localtunnel on port 8501 for Streamlit."""
+        """Spawns an automatic background localtunnel on port 8501 for Streamlit with fresh random subdomain."""
         streamlit_port = int(os.getenv("STREAMLIT_PORT", "8501"))
-        existing_url = tunnel_manager.get_tunnel_url("streamlit")
+        existing_url = tunnel_manager.get_tunnel_url("streamlit", verify=True)
         if existing_url and "localhost" not in existing_url:
             return {
                 "status": "already_running",
                 "streamlit_url": existing_url,
-                "message": "External tunnel is already active"
+                "message": "Verified external tunnel is already active"
             }
 
+        # Clear any stale process or URL
+        tunnel_manager.set_tunnel_url("streamlit", "")
         url = tunnel_manager.start_localtunnel(port=streamlit_port, service="streamlit")
         if url:
             return {
                 "status": "ready",
                 "streamlit_url": url,
-                "message": "Localtunnel started successfully"
+                "message": "Localtunnel started successfully with verified URL"
             }
         else:
             return {
@@ -359,7 +387,7 @@ try:
     app.include_router(api_router)
 
     # --------------------------------------------------------------------------
-    # Root Route '/' - Dynamic Gateway that never directs mobile phones to localhost
+    # Root Route '/' - Dynamic Gateway that never directs mobile phones to localhost or 503
     # --------------------------------------------------------------------------
     @app.get("/", response_class=HTMLResponse)
     async def root_gateway(request: Request):
@@ -370,7 +398,7 @@ try:
         
         # Check query param override e.g. /?streamlit_url=https://xyz.loca.lt
         query_st_url = request.query_params.get("streamlit_url") or request.query_params.get("target")
-        if query_st_url and query_st_url.startswith("http"):
+        if query_st_url and query_st_url.startswith("http") and "webook-ui.loca.lt" not in query_st_url:
             tunnel_manager.set_tunnel_url("streamlit", query_st_url)
 
         # 2. Resolve target URL with strict external safety rules
@@ -378,7 +406,9 @@ try:
         target_url = resolution.get("url") or ""
         target_type = resolution.get("target_type")
         is_external = resolution.get("is_external", False)
-        can_auto_redirect = resolution.get("can_auto_redirect", False)
+        is_verified = resolution.get("is_verified", False)
+        # CRITICAL SAFETY: Never auto-redirect on external tunnels to prevent 503 black holes
+        can_auto_redirect = False if is_external else resolution.get("can_auto_redirect", False)
         lan_ip = get_lan_ip()
 
         # If client explicitly requests JSON (e.g. curl or API client), provide JSON response
@@ -392,14 +422,14 @@ try:
                 "documentation": "/docs"
             })
 
-        # 3. Dynamic HTML Gateway Template
+        # 3. Dynamic HTML Gateway Template with In-Place Mobile Command Center
         html_content = f"""
         <!DOCTYPE html>
         <html lang="ar" dir="rtl">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-            <title>Webook Platform - بوابة التوجيه الذكية</title>
+            <title>Webook Platform - بوابة التحكم والتوجيه الذكية</title>
             <style>
                 * {{ box-sizing: border-box; }}
                 body {{
@@ -408,28 +438,31 @@ try:
                     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cairo", sans-serif;
                     display: flex;
                     flex-direction: column;
-                    justify-content: center;
                     align-items: center;
                     min-height: 100vh;
                     margin: 0;
                     padding: 16px;
-                    text-align: center;
+                }}
+                .container {{
+                    max-width: 600px;
+                    width: 100%;
+                    margin: 0 auto;
                 }}
                 .card {{
                     background: #111827;
                     border: 1px solid #1f2937;
                     border-radius: 20px;
-                    padding: 28px 24px;
-                    max-width: 540px;
+                    padding: 24px;
                     width: 100%;
                     box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
                     text-align: right;
+                    margin-bottom: 20px;
                 }}
                 .badge-container {{
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    margin-bottom: 20px;
+                    margin-bottom: 16px;
                     flex-wrap: wrap;
                     gap: 8px;
                 }}
@@ -455,24 +488,40 @@ try:
                     border-color: #d97706;
                     color: #fcd34d;
                 }}
+                .badge.red {{
+                    background: #7f1d1d;
+                    border-color: #dc2626;
+                    color: #fca5a5;
+                }}
                 h1 {{
-                    font-size: 22px;
+                    font-size: 20px;
                     margin: 0 0 10px 0;
                     color: #ffffff;
                     line-height: 1.4;
                 }}
                 p.lead {{
                     color: #94a3b8;
-                    font-size: 14px;
+                    font-size: 13px;
                     line-height: 1.6;
-                    margin: 0 0 20px 0;
+                    margin: 0 0 18px 0;
+                }}
+                .alert-box {{
+                    display: none;
+                    background: #450a0a;
+                    border: 1px solid #dc2626;
+                    border-radius: 12px;
+                    padding: 12px 14px;
+                    margin-bottom: 16px;
+                    font-size: 13px;
+                    color: #fecaca;
+                    line-height: 1.5;
                 }}
                 .info-box {{
                     background: #1e293b;
                     border: 1px solid #334155;
                     border-radius: 12px;
                     padding: 14px 16px;
-                    margin-bottom: 20px;
+                    margin-bottom: 18px;
                     font-size: 13px;
                     line-height: 1.6;
                     color: #cbd5e1;
@@ -481,41 +530,52 @@ try:
                 .btn-primary {{
                     display: block;
                     width: 100%;
-                    padding: 14px 20px;
-                    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+                    padding: 14px 18px;
+                    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
                     color: #ffffff;
                     text-decoration: none;
                     font-weight: 700;
-                    font-size: 16px;
+                    font-size: 15px;
                     border-radius: 12px;
                     border: none;
                     cursor: pointer;
                     text-align: center;
                     transition: transform 0.15s ease, opacity 0.15s ease;
                     min-height: 48px;
+                    box-shadow: 0 4px 14px rgba(236, 72, 153, 0.3);
                 }}
                 .btn-primary:active {{ transform: scale(0.98); }}
                 .btn-primary:disabled {{ opacity: 0.5; cursor: not-allowed; }}
                 
+                .btn-grid {{
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+                    margin-top: 12px;
+                }}
                 .btn-secondary {{
                     display: block;
                     width: 100%;
-                    padding: 12px 18px;
+                    padding: 12px;
                     background: #1f2937;
                     border: 1px solid #374151;
                     color: #e2e8f0;
-                    text-decoration: none;
                     font-weight: 600;
-                    font-size: 14px;
+                    font-size: 13px;
                     border-radius: 12px;
                     cursor: pointer;
                     text-align: center;
-                    margin-top: 10px;
                     min-height: 44px;
                 }}
+                .btn-danger {{
+                    background: #2a1215;
+                    border-color: #7f1d1d;
+                    color: #fca5a5;
+                }}
+                .btn-danger:hover {{ background: #3b161a; }}
                 
                 .input-group {{
-                    margin-top: 20px;
+                    margin-top: 16px;
                     text-align: right;
                 }}
                 .input-group label {{
@@ -565,194 +625,271 @@ try:
                     box-shadow: 0 0 8px #10b981;
                 }}
                 .dot.amber {{ background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }}
+                .dot.red {{ background: #ef4444; box-shadow: 0 0 8px #ef4444; }}
+
+                /* In-Place Dashboard Styles */
+                .section-header {{
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 14px;
+                    border-bottom: 1px solid #1f2937;
+                    padding-bottom: 10px;
+                }}
+                .section-header h2 {{
+                    font-size: 16px;
+                    margin: 0;
+                    color: #f1f5f9;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }}
+                .event-card {{
+                    background: #0d121f;
+                    border: 1px solid #1e293b;
+                    border-radius: 12px;
+                    padding: 14px;
+                    margin-bottom: 10px;
+                    transition: border-color 0.2s;
+                }}
+                .event-card:hover {{ border-color: #3b82f6; }}
+                .event-title {{
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: #ffffff;
+                    margin-bottom: 6px;
+                }}
+                .event-meta {{
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 12px;
+                    color: #94a3b8;
+                    flex-wrap: wrap;
+                    gap: 6px;
+                }}
+                .pill {{
+                    background: #1e293b;
+                    padding: 3px 8px;
+                    border-radius: 6px;
+                    font-size: 11px;
+                }}
+                .pill.pink {{ background: #831843; color: #fbcfe8; }}
+                .pill.green {{ background: #064e3b; color: #a7f3d0; }}
+                .pill.blue {{ background: #1e3a8a; color: #bfdbfe; }}
+
                 .links {{
-                    margin-top: 24px;
+                    margin-top: 20px;
                     font-size: 12px;
                     color: #64748b;
                     text-align: center;
                 }}
                 .links a {{ color: #94a3b8; text-decoration: none; margin: 0 6px; }}
-                .command-pill {{
-                    background: #090d16;
-                    border: 1px solid #1e293b;
-                    padding: 8px 12px;
-                    border-radius: 8px;
-                    font-family: monospace;
-                    font-size: 12px;
-                    direction: ltr;
-                    text-align: left;
-                    color: #38bdf8;
-                    margin-top: 8px;
-                    overflow-x: auto;
-                }}
             </style>
         </head>
         <body>
-            <div class="card">
-                <div class="badge-container">
-                    <span class="badge {'green' if can_auto_redirect else 'amber'}">
-                        {'🟢 اتصال مؤكد' if can_auto_redirect else '⚡ تهيئة الرابط الخارجي'}
-                    </span>
-                    <span class="badge">
-                        {'📱 نطاق خارجي (Localtunnel)' if is_external else '💻 اتصال محلي'}
-                    </span>
-                </div>
-
-                <h1 id="main-title">
-                    {'🎯 توجيه مباشر إلى واجهة Streamlit' if can_auto_redirect else '🌐 ربط واجهة Streamlit بالنطاق الخارجي'}
-                </h1>
-
-                <p class="lead" id="main-lead">
-                    {'تم اكتشاف رابط الواجهة الخارجي بنجاح. سيتم توجيهك فورياً دون أي تعارض مع localhost.' if can_auto_redirect else 'أنت متصل الآن من هاتفك أو جهاز خارجي عبر نفق Localtunnel. تم إيقاف التوجيه لـ localhost لحماية الاتصال من الهاتف.'}
-                </p>
-
-                <div class="info-box" id="info-box">
-                    <div><b>خادم الـ API:</b> <span style="direction: ltr; display: inline-block;">/api (Port {os.getenv('API_PORT', '8000')})</span></div>
-                    <div><b>المضيف المكتشف:</b> <span style="direction: ltr; display: inline-block;">{host_header}</span></div>
-                    <div id="target-ui-display" style="margin-top: 6px;">
-                        <b>وجهة Streamlit:</b> <span id="target-ui-text" style="direction: ltr; display: inline-block; color: #38bdf8;">{target_url if target_url else 'جاري البحث عن نفق نشط...'}</span>
+            <div class="container">
+                <!-- Main Gateway Card -->
+                <div class="card">
+                    <div class="badge-container">
+                        <span class="badge {'green' if is_verified else 'amber'}" id="status-badge">
+                            {'🟢 نفق الواجهة مؤكد' if is_verified else '⚡ الواجهة جاهزة للربط'}
+                        </span>
+                        <span class="badge">
+                            {'📱 نفق خارجي' if is_external else '💻 اتصال محلي'}
+                        </span>
                     </div>
-                </div>
 
-                <!-- Main Action Button -->
-                <a href="{target_url if target_url else '#'}" 
-                   id="action-btn" 
-                   class="btn-primary" 
-                   {'onclick="handleDirectClick(event)"' if not target_url else ''}>
-                    {'🚀 الدخول المباشر لواجهة Streamlit' if target_url else '⏳ جاري الكشف عن رابط Streamlit...'}
-                </a>
+                    <h1 id="main-title">🎯 بوابة تحكم منصة Webook الذكية</h1>
 
-                <!-- Helper Actions for External Access -->
-                <div id="external-helpers" style="display: {'none' if can_auto_redirect else 'block'};">
-                    <button class="btn-secondary" id="btn-spawn-tunnel" onclick="triggerSpawnTunnel()">
-                        ⚡ تفعيل نفق Streamlit تلقائيًا من السيرفر
+                    <p class="lead" id="main-lead">
+                        خادم الـ API يعمل بنجاح. تم تأمين الوصول الخارجي لمنع أخطاء 503 Tunnel Unavailable والتوجيه الخاطئ لـ localhost.
+                    </p>
+
+                    <!-- Alert Box for 503 Warnings -->
+                    <div class="alert-box" id="error-alert">
+                        ⚠️ <b>تم رصد تعطل في نفق الواجهة الخارجي (503).</b><br>
+                        تم مسح الرابط التالف بنجاح لحماية متصفحك. يرجى الضغط على زر "⚡ إنشاء نفق جديد" أدناه لتوليد رابط نشط، أو يمكنك استخدام لوحة الفعاليات المباشرة بالأسفل فوراً!
+                    </div>
+
+                    <div class="info-box" id="info-box">
+                        <div><b>خادم الـ API:</b> <span style="direction: ltr; display: inline-block;">/api (Port {os.getenv('API_PORT', '8000')})</span></div>
+                        <div><b>المضيف المكتشف:</b> <span style="direction: ltr; display: inline-block;">{host_header}</span></div>
+                        <div id="target-ui-display" style="margin-top: 6px;">
+                            <b>وجهة Streamlit:</b> <span id="target-ui-text" style="direction: ltr; display: inline-block; color: #38bdf8;">{target_url if target_url else 'غير مقترن (اضغط تفعيل نفق جديد)'}</span>
+                        </div>
+                    </div>
+
+                    <!-- Main Action Button -->
+                    <button id="action-btn" class="btn-primary" onclick="handleStreamlitAccess()">
+                        {'🚀 الدخول إلى واجهة Streamlit' if target_url else '⚡ تفعيل نفق Streamlit والتوجيه'}
                     </button>
 
+                    <!-- Action Grid -->
+                    <div class="btn-grid">
+                        <button class="btn-secondary" id="btn-spawn-tunnel" onclick="triggerSpawnTunnel()">
+                            ⚡ إنشاء نفق جديد للواجهة
+                        </button>
+                        <button class="btn-secondary btn-danger" onclick="resetAllTunnels()">
+                            🧹 مسح الذاكرة وإصلاح 503
+                        </button>
+                    </div>
+
+                    <!-- Manual Input for Custom Tunnels -->
                     <div class="input-group">
-                        <label for="manual-tunnel-input">أو الصق رابط نفق واجهة Streamlit إذا قمت بتشغيله يدويًا:</label>
+                        <label for="manual-tunnel-input">أو الصق رابط نفق Streamlit اليدوي إذا تم تشغيله:</label>
                         <div class="input-row">
                             <input type="text" id="manual-tunnel-input" placeholder="https://xxxx.loca.lt" />
-                            <button type="button" onclick="saveManualTunnel()">حفظ وتوجيه ➡️</button>
+                            <button type="button" onclick="saveManualTunnel()">حفظ الربط 🔗</button>
                         </div>
-                        <div class="command-pill">
-                            أمر تشغيل نفق الواجهة في الطرفية: npx localtunnel --port {streamlit_port}
-                        </div>
+                    </div>
+
+                    <div class="status-indicator">
+                        <span class="dot {'green' if is_verified else 'amber'}" id="status-dot"></span>
+                        <span id="status-text">{'النفق مفحوص وجاهز' if is_verified else 'جاهز للتشغيل'}</span>
+                    </div>
+
+                    <div class="links">
+                        <a href="/api">مسار API</a> •
+                        <a href="/docs">توثيق Swagger (/docs)</a> •
+                        <a href="/api/health">فحص الصحة</a> •
+                        <a href="javascript:void(0)" onclick="loadEvents()">🔄 تحديث الفعاليات</a>
                     </div>
                 </div>
 
-                <div class="status-indicator">
-                    <span class="dot {'green' if can_auto_redirect else 'amber'}" id="status-dot"></span>
-                    <span id="status-text">{'جاهز للتوجيه التلقائي' if can_auto_redirect else 'في انتظار تحديد نفق الواجهة'}</span>
+                <!-- In-Place Mobile Events and Tasks Feed -->
+                <div class="card">
+                    <div class="section-header">
+                        <h2>🎫 أحدث فعاليات Webook المكتشفة</h2>
+                        <button class="pill blue" style="border:none; cursor:pointer;" onclick="loadEvents()">🔄 تحديث مباشر</button>
+                    </div>
+                    <div id="events-feed">
+                        <div style="text-align:center; padding: 20px; color: #94a3b8;">⏳ جاري جلب الفعاليات المباشرة...</div>
+                    </div>
                 </div>
 
-                <div class="links">
-                    <a href="/api">مسار الـ API (/api)</a> •
-                    <a href="/docs">توثيق Swagger (/docs)</a> •
-                    <a href="/api/health">فحص الصحة</a>
+                <!-- Sniper Tasks Monitor -->
+                <div class="card">
+                    <div class="section-header">
+                        <h2>🎯 حالة مهام القنص وحجز المقاعد</h2>
+                        <span class="pill green" id="bot-status-pill">🤖 البوت متصل</span>
+                    </div>
+                    <div id="tasks-feed">
+                        <div style="text-align:center; padding: 15px; color: #94a3b8;">⏳ جاري فحص المهام...</div>
+                    </div>
                 </div>
             </div>
 
             <script>
-                const isExternal = {'true' if is_external else 'false'};
                 let resolvedTargetUrl = "{target_url}";
-                let countdown = 2;
-                let redirectTimer = null;
+                const isExternal = {'true' if is_external else 'false'};
 
-                // 1. Check local storage on the client phone
+                // 1. Clean toxic stale localstorage immediately if it contains broken subdomains
                 const cachedClientTunnel = localStorage.getItem("webook_streamlit_tunnel_url");
-                if (cachedClientTunnel && !resolvedTargetUrl && cachedClientTunnel.startsWith("http")) {{
-                    applyTargetUrl(cachedClientTunnel, "ذاكرة الهاتف المحفوظة");
+                if (cachedClientTunnel) {{
+                    if (cachedClientTunnel.includes("webook-ui.loca.lt") || !cachedClientTunnel.startsWith("http")) {{
+                        localStorage.removeItem("webook_streamlit_tunnel_url");
+                    }} else if (!resolvedTargetUrl) {{
+                        resolvedTargetUrl = cachedClientTunnel;
+                        document.getElementById("target-ui-text").innerText = resolvedTargetUrl;
+                    }}
                 }}
 
-                // 2. Poll the API to auto-discover active Streamlit tunnels
-                async function checkTunnelStatus() {{
+                // 2. Safe Streamlit Access with pre-flight verification
+                async function handleStreamlitAccess() {{
+                    const btn = document.getElementById("action-btn");
+                    const alertBox = document.getElementById("error-alert");
+
+                    if (!resolvedTargetUrl || resolvedTargetUrl === "#" || resolvedTargetUrl.includes("localhost")) {{
+                        await triggerSpawnTunnel();
+                        return;
+                    }}
+
+                    btn.disabled = true;
+                    btn.innerText = "⏳ جاري التحقق من أمان النفق...";
+                    alertBox.style.display = "none";
+
                     try {{
-                        const res = await fetch("/api/tunnel/info");
-                        if (!res.ok) return;
-                        const data = await res.json();
-                        
-                        if (data.streamlit_url && data.streamlit_url.startsWith("http") && !data.streamlit_url.includes("localhost")) {{
-                            applyTargetUrl(data.streamlit_url, "نفق Streamlit النشط");
-                        }} else if (!isExternal && data.lan_ip) {{
-                            const lanTarget = window.location.protocol + "//" + data.lan_ip + ":{streamlit_port}";
-                            applyTargetUrl(lanTarget, "الشبكة المحلية LAN");
-                        }}
-                    }} catch (e) {{
-                        console.warn("Tunnel status fetch error:", e);
-                    }}
-                }}
+                        const verifyRes = await fetch("/api/tunnel/verify?url=" + encodeURIComponent(resolvedTargetUrl));
+                        const verifyData = await verifyRes.json();
 
-                function applyTargetUrl(url, source) {{
-                    resolvedTargetUrl = url.trim().replace(/\\/$/, "");
-                    localStorage.setItem("webook_streamlit_tunnel_url", resolvedTargetUrl);
-                    
-                    const btn = document.getElementById("action-btn");
-                    const targetText = document.getElementById("target-ui-text");
-                    const statusDot = document.getElementById("status-dot");
-                    const statusText = document.getElementById("status-text");
-                    const mainTitle = document.getElementById("main-title");
-                    const helpers = document.getElementById("external-helpers");
-
-                    btn.href = resolvedTargetUrl;
-                    btn.innerText = "🚀 الدخول المباشر لواجهة Streamlit";
-                    targetText.innerText = resolvedTargetUrl;
-                    
-                    statusDot.className = "dot green";
-                    statusText.innerText = "تم الربط بالنطاق الخارجي (" + source + ")";
-                    mainTitle.innerText = "🎯 توجيه مباشر إلى واجهة Streamlit";
-                    if (helpers) helpers.style.display = "none";
-
-                    // Auto-redirect once resolved
-                    if (!redirectTimer) {{
-                        startAutoRedirect();
-                    }}
-                }}
-
-                function startAutoRedirect() {{
-                    const btn = document.getElementById("action-btn");
-                    btn.innerText = "🚀 الانتقال للواجهة (" + countdown + " ثوانٍ)...";
-                    redirectTimer = setInterval(() => {{
-                        countdown--;
-                        if (countdown <= 0) {{
-                            clearInterval(redirectTimer);
+                        if (verifyData.alive) {{
+                            btn.innerText = "✅ جاري التوجيه...";
                             window.location.href = resolvedTargetUrl;
                         }} else {{
-                            btn.innerText = "🚀 الانتقال للواجهة (" + countdown + " ثوانٍ)...";
+                            // Tunnel is returning 503 or dead!
+                            btn.disabled = false;
+                            btn.innerText = "⚡ توليد نفق جديد نشط";
+                            alertBox.style.display = "block";
+                            localStorage.removeItem("webook_streamlit_tunnel_url");
+                            resolvedTargetUrl = "";
+                            document.getElementById("target-ui-text").innerText = "غير متاح (503) - اضغط توليد جديد";
+                            document.getElementById("status-dot").className = "dot red";
+                            document.getElementById("status-text").innerText = "النفق السابق معطل (503)";
                         }}
-                    }}, 1000);
+                    }} catch (e) {{
+                        btn.disabled = false;
+                        btn.innerText = "🚀 الانتقال للواجهة";
+                        window.location.href = resolvedTargetUrl;
+                    }}
                 }}
 
+                // 3. Spawn Fresh Localtunnel Process
                 async function triggerSpawnTunnel() {{
                     const btn = document.getElementById("btn-spawn-tunnel");
+                    const actionBtn = document.getElementById("action-btn");
+                    const alertBox = document.getElementById("error-alert");
+                    
+                    alertBox.style.display = "none";
                     btn.disabled = true;
-                    btn.innerText = "⏳ جاري تشغيل النفق على السيرفر...";
+                    btn.innerText = "⏳ جاري توليد النفق...";
+                    actionBtn.innerText = "⏳ جاري إطلاق النفق الجديد...";
+
                     try {{
                         const res = await fetch("/api/tunnel/start-streamlit", {{ method: "POST" }});
                         const data = await res.json();
                         if (data.streamlit_url) {{
-                            applyTargetUrl(data.streamlit_url, "تم التفعيل تلقائياً");
+                            resolvedTargetUrl = data.streamlit_url;
+                            localStorage.setItem("webook_streamlit_tunnel_url", resolvedTargetUrl);
+                            document.getElementById("target-ui-text").innerText = resolvedTargetUrl;
+                            document.getElementById("status-badge").className = "badge green";
+                            document.getElementById("status-badge").innerText = "🟢 نفق جديد نشط";
+                            document.getElementById("status-dot").className = "dot green";
+                            document.getElementById("status-text").innerText = "تم الربط بنجاح";
+                            actionBtn.disabled = false;
+                            actionBtn.innerText = "🚀 الدخول إلى واجهة Streamlit الجديدة";
+                            btn.innerText = "⚡ إنشاء نفق جديد للواجهة";
+                            btn.disabled = false;
                         }} else {{
-                            btn.innerText = "🔄 جاري استخراج الرابط، يرجى الانتظار...";
-                            setTimeout(checkTunnelStatus, 3000);
+                            btn.innerText = "🔄 جاري الانتظار والتأكيد...";
+                            setTimeout(checkTunnelStatus, 4000);
                         }}
                     }} catch (e) {{
                         btn.disabled = false;
-                        btn.innerText = "⚠️ تعذر التفعيل التلقائي، جرب الإدخال اليدوي";
+                        btn.innerText = "⚠️ تعذر التوليد، جرب الإدخال اليدوي";
+                        actionBtn.disabled = false;
+                        actionBtn.innerText = "🚀 الدخول إلى واجهة Streamlit";
                     }}
                 }}
 
+                // 4. Reset All Tunnels and Wipe 503 Cache
+                async function resetAllTunnels() {{
+                    if (!confirm("هل ترغب في مسح روابط الأنفاق المحفوظة وإصلاح خطأ 503؟")) return;
+                    localStorage.removeItem("webook_streamlit_tunnel_url");
+                    try {{
+                        await fetch("/api/tunnel/reset", {{ method: "POST" }});
+                    }} catch (e) {{}}
+                    window.location.href = window.location.pathname;
+                }}
+
+                // 5. Save Manual Tunnel URL
                 async function saveManualTunnel() {{
                     const input = document.getElementById("manual-tunnel-input");
                     let val = input.value.trim();
                     if (!val) {{
-                        alert("يرجى إدخال رابط النفق الخارجي");
+                        alert("يرجى إدخال رابط النفق");
                         return;
                     }}
-                    if (!val.startsWith("http")) {{
-                        val = "https://" + val;
-                    }}
-                    
-                    // Register on server
+                    if (!val.startsWith("http")) val = "https://" + val;
                     try {{
                         await fetch("/api/tunnel/set", {{
                             method: "POST",
@@ -760,31 +897,73 @@ try:
                             body: JSON.stringify({{ streamlit_url: val }})
                         }});
                     }} catch (e) {{}}
-                    
-                    applyTargetUrl(val, "إدخال يدوي");
-                    window.location.href = val;
+                    localStorage.setItem("webook_streamlit_tunnel_url", val);
+                    resolvedTargetUrl = val;
+                    document.getElementById("target-ui-text").innerText = val;
+                    alert("تم حفظ الرابط وتفعيله بنجاح!");
                 }}
 
-                function handleDirectClick(e) {{
-                    if (!resolvedTargetUrl || resolvedTargetUrl === "#") {{
-                        e.preventDefault();
-                        triggerSpawnTunnel();
+                // 6. Live Events Loader for Mobile Feed
+                async function loadEvents() {{
+                    const feed = document.getElementById("events-feed");
+                    try {{
+                        const res = await fetch("/api/events?limit=5");
+                        const data = await res.json();
+                        const events = data.events || [];
+                        if (events.length === 0) {{
+                            feed.innerHTML = '<div style="text-align:center; padding: 15px; color:#94a3b8;">لا توجد فعاليات مسجلة حالياً</div>';
+                            return;
+                        }}
+                        let html = '';
+                        events.forEach(ev => {{
+                            html += `
+                                <div class="event-card">
+                                    <div class="event-title">${{ev.title || 'فعالية'}}</div>
+                                    <div class="event-meta">
+                                        <span class="pill pink">${{ev.genre || 'عام'}}</span>
+                                        <span class="pill blue">📍 ${{ev.venue || 'الرياض'}}</span>
+                                        <span class="pill green">🎟️ المقاعد: ${{ev.available_seats || 0}}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }});
+                        feed.innerHTML = html;
+                    }} catch (e) {{
+                        feed.innerHTML = '<div style="text-align:center; color:#ef4444; padding:10px;">تعذر تحميل الفعاليات</div>';
                     }}
                 }}
 
-                // Start polling if target is not yet external
-                if (!resolvedTargetUrl || resolvedTargetUrl.includes("localhost")) {{
-                    checkTunnelStatus();
-                    const pollInterval = setInterval(() => {{
-                        if (resolvedTargetUrl && !resolvedTargetUrl.includes("localhost")) {{
-                            clearInterval(pollInterval);
+                // 7. Live Tasks & Bot Status Loader
+                async function loadTasksAndBot() {{
+                    const tasksFeed = document.getElementById("tasks-feed");
+                    try {{
+                        const res = await fetch("/api/tasks");
+                        const data = await res.json();
+                        const tasks = data.tasks || [];
+                        if (tasks.length === 0) {{
+                            tasksFeed.innerHTML = '<div style="text-align:center; padding:10px; color:#94a3b8;">لا توجد مهام قنص نشطة حالياً</div>';
                         }} else {{
-                            checkTunnelStatus();
+                            let html = '';
+                            tasks.forEach(t => {{
+                                html += `
+                                    <div class="event-card" style="border-left: 3px solid #10b981;">
+                                        <div class="event-title" style="font-size:13px;">${{t.event_title || t.event_slug}}</div>
+                                        <div class="event-meta">
+                                            <span class="pill green">${{t.status}}</span>
+                                            <span>المقاعد: ${{t.seat_count}}</span>
+                                            <span>الفئة: ${{t.category || 'VIP'}}</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }});
+                            tasksFeed.innerHTML = html;
                         }}
-                    }}, 2500);
-                }} else if ({'true' if can_auto_redirect else 'false'}) {{
-                    startAutoRedirect();
+                    }} catch (e) {{}}
                 }}
+
+                // Initial Load
+                loadEvents();
+                loadTasksAndBot();
             </script>
         </body>
         </html>
