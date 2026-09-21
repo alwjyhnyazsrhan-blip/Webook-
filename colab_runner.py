@@ -15,6 +15,7 @@ import shutil
 import asyncio
 import subprocess
 import urllib.request
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -55,8 +56,17 @@ def ensure_cloudflared() -> bool:
         print(f"[SETUP] Could not install cloudflared ({e}), falling back to localtunnel.")
         return False
 
+def extract_cf_tunnel_url(log_text: str) -> Optional[str]:
+    """Strictly extracts the assigned quick tunnel subdomain URL (e.g. https://xxx-yyy.trycloudflare.com)."""
+    matches = re.findall(r'https://([a-zA-Z0-9\-]+)\.trycloudflare\.com', log_text, re.IGNORECASE)
+    for sub in matches:
+        sub_clean = sub.strip().lower()
+        if sub_clean and sub_clean not in ["www", "api", "trycloudflare", "blog", "docs", "static"]:
+            return f"https://{sub}.trycloudflare.com"
+    return None
+
 def start_cloudflare_tunnel(port: int, service_name: str = "Streamlit") -> Optional[str]:
-    """Starts a Cloudflare quick tunnel targeting the given port and captures the trycloudflare.com URL."""
+    """Starts a Cloudflare quick tunnel targeting the given port and captures the unique trycloudflare.com URL."""
     cf_bin = get_cf_binary()
     if not cf_bin:
         return None
@@ -66,19 +76,14 @@ def start_cloudflare_tunnel(port: int, service_name: str = "Streamlit") -> Optio
         cmd = [cf_bin, "tunnel", "--url", f"http://127.0.0.1:{port}"]
         proc = subprocess.Popen(cmd, stdout=f, stderr=subprocess.STDOUT)
         
-        # Wait up to 10 seconds for URL
-        for _ in range(20):
+        # Wait up to 25 seconds for the actual assigned quick tunnel URL
+        for _ in range(50):
             time.sleep(0.5)
             if log_file.exists():
                 text = log_file.read_text(encoding="utf-8", errors="ignore")
-                for line in text.splitlines():
-                    if "trycloudflare.com" in line:
-                        for token in line.split():
-                            if "trycloudflare.com" in token:
-                                clean_url = token.strip().strip("|").strip()
-                                if not clean_url.startswith("http"):
-                                    clean_url = f"https://{clean_url}"
-                                return clean_url
+                url = extract_cf_tunnel_url(text)
+                if url:
+                    return url
         return None
     except Exception as e:
         print(f"[TUNNEL_WARN] Cloudflare tunnel failed for {service_name}: {e}")
@@ -94,10 +99,13 @@ def start_localtunnel_fallback(port: int, subdomain: Optional[str] = None) -> Op
             cmd.extend(["--subdomain", subdomain])
         proc = subprocess.Popen(cmd, stdout=f, stderr=subprocess.STDOUT)
         
-        for _ in range(15):
+        for _ in range(30):
             time.sleep(0.5)
             if log_file.exists():
                 text = log_file.read_text(encoding="utf-8", errors="ignore")
+                matches = re.findall(r'https?://[a-zA-Z0-9\-]+\.loca\.lt', text)
+                if matches:
+                    return matches[0]
                 for line in text.splitlines():
                     if "loca.lt" in line and "your url is:" in line.lower():
                         parts = line.split("is:")
@@ -141,7 +149,8 @@ def main():
     print("[1/4] Creating External Unified Public Tunnel (Single Link for All Services)...")
     # Single Unified Tunnel on Port 8000 (Serves Web GUI at /, REST API at /api, Docs at /docs)
     unified_url = start_cloudflare_tunnel(8000, "Webook_Portal")
-    if not unified_url:
+    if not unified_url or unified_url.rstrip("/").lower() in ["https://trycloudflare.com", "http://trycloudflare.com"]:
+        print("[TUNNEL] Cloudflare assigned url invalid or unavailable, trying localtunnel fallback...")
         unified_url = start_localtunnel_fallback(8000)
     if not unified_url:
         unified_url = "http://localhost:8000"
