@@ -295,6 +295,10 @@ if "streamlit" in sys.modules or any("streamlit" in arg for arg in sys.argv):
         st.title("🎯 Webook Ingestion & Sniper Platform")
         st.info("Streamlit GUI active. Loading control center...")
 
+async def main():
+    """Programmatic entrypoint for external orchestrators and Google Colab."""
+    await run_unified_ecosystem()
+
 # ------------------------------------------------------------------------------
 # 7. CLI Entrypoint
 # ------------------------------------------------------------------------------

@@ -32,26 +32,33 @@ def get_colab_public_ip() -> str:
     except Exception:
         return "Not available (Run 'curl ifconfig.me' in cell)"
 
+def get_cf_binary() -> Optional[str]:
+    """Finds available cloudflared executable."""
+    candidate = shutil.which("cloudflared")
+    if candidate:
+        return candidate
+    for p in ["/usr/local/bin/cloudflared", "/tmp/cloudflared", "/usr/bin/cloudflared"]:
+        if os.path.exists(p) and os.access(p, os.X_OK):
+            return p
+    return None
+
 def ensure_cloudflared() -> bool:
     """Downloads and setups cloudflared binary on Linux/Colab for zero-password instant tunnels."""
-    if shutil.which("cloudflared"):
+    if get_cf_binary():
         return True
     try:
-        bin_path = Path("/usr/local/bin/cloudflared")
-        if bin_path.exists():
-            return True
         print("[SETUP] Installing Cloudflared for instant, password-free tunnel...")
         cmd = "curl -L --silent https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /tmp/cloudflared && chmod +x /tmp/cloudflared"
         subprocess.run(cmd, shell=True, check=True)
-        return True
+        return bool(get_cf_binary())
     except Exception as e:
         print(f"[SETUP] Could not install cloudflared ({e}), falling back to localtunnel.")
         return False
 
 def start_cloudflare_tunnel(port: int, service_name: str = "Streamlit") -> Optional[str]:
     """Starts a Cloudflare quick tunnel targeting the given port and captures the trycloudflare.com URL."""
-    cf_bin = shutil.which("cloudflared") or "/tmp/cloudflared"
-    if not os.path.exists(cf_bin) and not shutil.which("cloudflared"):
+    cf_bin = get_cf_binary()
+    if not cf_bin:
         return None
     try:
         log_file = PROJECT_ROOT / f".cf_{service_name.lower()}.log"
@@ -178,12 +185,20 @@ def main():
     ]
     st_proc = subprocess.Popen(st_cmd, env=st_env)
 
-    # 3. Import and Run FastAPI Backend + Services via main.py
+    # 3. Import and Run FastAPI Backend & Web Portal
     print("[3/4] Initializing FastAPI Backend & Web Services...")
     try:
-        from main import main as main_orchestrator
-        # Run the concurrent orchestrator
-        asyncio.run(main_orchestrator())
+        import uvicorn
+        from apps.api.main import app as api_app
+        config = uvicorn.Config(
+            api_app,
+            host="0.0.0.0",
+            port=8000,
+            log_level="info",
+            access_log=False
+        )
+        server = uvicorn.Server(config)
+        asyncio.run(server.serve())
     except KeyboardInterrupt:
         print("\n[STOP] Shutting down Webook Colab Services...")
     finally:
